@@ -7,6 +7,27 @@
 
 ---
 
+## [2026-05-03] — Instruction Runbooks Filled [COMPLETED — branch: docs/fill-instruction-stubs]
+
+### Summary
+
+**[DOCS] Replaced three `.claude/instructions/` stubs with full runbook content.**
+
+- `.claude/instructions/firebase-setup.md` — stubs replaced with content (filled in prior session)
+- `.claude/instructions/github-pages-setup.md` — stubs replaced with content
+- `.claude/instructions/security-checklist.md` — stubs replaced with content
+
+Firebase setup covers project creation (`wal-<app-name>` naming), RTDB vs Firestore tradeoff, web config wiring (SDK 10.7.1 ES module pattern from ride-tracker), three security rule tiers, free-tier ceilings, and a pre-share checklist.
+
+GitHub Pages setup covers Pattern A (current, branch root) vs Pattern B (Actions, multi-app), the complete Pattern B workflow YAML, one-time switch steps, custom domain, cache busting, rollback, and when to move to Netlify/Cloudflare.
+
+Security checklist covers 9 sections (secrets, Firebase rules, user input, supply chain, logging, free-tier limits, privacy, accessibility, pre-share) plus a hard-stop/redesign list. Format: Skeptic persona pass with `[ ]` checkboxes.
+
+**Open items:**
+- `.claude/instructions/deployment.md` — still pending (stub only)
+
+---
+
 ## [2026-05-03] — Program Base Restructure [COMPLETED — branch: restructure/program-base]
 
 ### Summary
