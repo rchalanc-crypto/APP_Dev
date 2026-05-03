@@ -1,0 +1,29 @@
+/* shared/design-tokens/tokens.css
+ *
+ * Web Apps Lab — baseline design tokens.
+ * Extracted from the ride-tracker exemplar. Override per app; don't edit here.
+ *
+ * Usage (self-contained single-file app):
+ *   Copy the :root block into your <style> tag.
+ *
+ * Usage (multi-file app):
+ *   <link rel="stylesheet" href="/shared/design-tokens/tokens.css">
+ *   or @import '../../../shared/design-tokens/tokens.css';
+ */
+
+:root {
+    /* Brand greens */
+    --trail-green: #2d5a3d;
+    --moss:        #5a7a5a;
+
+    /* Accent */
+    --dirt:        #8b6f47;
+    --ocean:       #2b6b8a;
+    --sky:         #87ceeb;
+    --orange:      #d97642;
+
+    /* Neutrals */
+    --cream:       #f5f1e8;
+    --dark:        #1a1a1a;
+    --light-gray:  #e0ddd4;
+}
