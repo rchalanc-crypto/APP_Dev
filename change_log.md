@@ -7,6 +7,28 @@
 
 ---
 
+## [2026-05-03] — Deployment Runbook Drafted [COMPLETED — branch: docs/draft-deployment-runbook]
+
+### Summary
+
+**[DOCS] Drafted `.claude/instructions/deployment.md` — the orchestrating end-to-end deployment runbook.**
+
+All four `.claude/instructions/` runbooks are now filled; the instruction layer is complete.
+
+- Covers deployment target selection (GitHub Pages / Netlify / Cloudflare Pages decision table)
+- Standard deploy flows for both GitHub Pages (single-file) and Netlify (build-step)
+- Public-promotion gate (four conditions must hold before sharing a URL beyond a closed group)
+- Rollback procedure for both Pages and Netlify
+- Disaster-scenario quick-reference table (404, Firebase quota, secret leak, stale cache)
+- Multi-app coordination notes (Pattern A vs B behavior, adding/removing apps)
+- Explicit "what goes here vs. elsewhere" section linking out to the three sibling runbooks
+
+Does not duplicate content from firebase-setup.md, github-pages-setup.md, or security-checklist.md — links to them throughout.
+
+**Instruction layer now complete. All four runbooks ready for upload to Claude.ai Project per `docs/PROGRAM_PLAN.md §3`.**
+
+---
+
 ## [2026-05-03] — Instruction Runbooks Filled [COMPLETED — branch: docs/fill-instruction-stubs]
 
 ### Summary
@@ -24,7 +46,7 @@ GitHub Pages setup covers Pattern A (current, branch root) vs Pattern B (Actions
 Security checklist covers 9 sections (secrets, Firebase rules, user input, supply chain, logging, free-tier limits, privacy, accessibility, pre-share) plus a hard-stop/redesign list. Format: Skeptic persona pass with `[ ]` checkboxes.
 
 **Open items:**
-- `.claude/instructions/deployment.md` — still pending (stub only)
+- `.claude/instructions/deployment.md` — still pending (stub only) [CLOSED — drafted in branch docs/draft-deployment-runbook, 2026-05-03]
 
 ---
 
