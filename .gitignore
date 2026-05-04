@@ -1,0 +1,17 @@
+# Build output
+dist/
+_site/
+
+# Environment secrets
+.env
+.env.local
+.env.*.local
+
+# Windows metadata
+*:Zone.Identifier
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
