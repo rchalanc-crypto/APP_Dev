@@ -1014,6 +1014,9 @@
 
       try {
         const snap = await get(ref(db, 'invitees'));
+        console.log('[RSVP] snap.numChildren():', snap.numChildren());
+        console.log('[RSVP] snap.val():', JSON.stringify(snap.val()));
+        console.log('[RSVP] currentUser.uid:', currentUser?.uid);
         loadEl.style.display = 'none';
         tableEl.style.display = '';
 
