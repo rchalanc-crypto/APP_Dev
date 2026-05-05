@@ -9,16 +9,16 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --deep-blue:   #1a3a5c;
-      --ocean:       #2b6b8a;
-      --azure:       #4a90b8;
-      --sand:        #e8d5b0;
-      --terracotta:  #c86b3a;
-      --cream:       #faf6ee;
-      --light-gray:  #ede8df;
-      --dark:        #1a1a2e;
-      --muted:       #5a6a7a;
-      --error:       #b91c1c;
+      --deep-blue:  #1a3a5c;
+      --ocean:      #2b6b8a;
+      --azure:      #4a90b8;
+      --sand:       #e8d5b0;
+      --terracotta: #c86b3a;
+      --cream:      #faf6ee;
+      --light-gray: #ede8df;
+      --dark:       #1a1a2e;
+      --muted:      #5a6a7a;
+      --error:      #b91c1c;
     }
 
     body {
@@ -29,22 +29,21 @@
       padding: 20px;
     }
 
-    /* ── Screens ─────────────────────────────────────────────────── */
+    /* ── Screens ───────────────────────────────────────────────────── */
     .screen {
       display: none;
       align-items: center;
       justify-content: center;
       min-height: calc(100vh - 40px);
     }
-
     .screen.active { display: flex; }
 
-    /* ── Card ────────────────────────────────────────────────────── */
+    /* ── Card ──────────────────────────────────────────────────────── */
     .card {
       background: white;
       border-radius: 16px;
       padding: 48px 40px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
       max-width: 400px;
       width: 100%;
       animation: fadeUp 0.4s ease-out;
@@ -55,7 +54,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Branding ─────────────────────────────────────────────────── */
+    /* ── Branding ──────────────────────────────────────────────────── */
     .brand-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 3.2rem;
@@ -66,7 +65,6 @@
       background-clip: text;
       margin-bottom: 4px;
     }
-
     .brand-sub {
       font-size: 0.78rem;
       letter-spacing: 3px;
@@ -75,15 +73,13 @@
       margin-bottom: 28px;
     }
 
-    /* ── Auth form ───────────────────────────────────────────────── */
+    /* ── Auth form ─────────────────────────────────────────────────── */
     .auth-screen .card { text-align: center; }
-
     .auth-intro {
       color: var(--muted);
       font-size: 0.95rem;
       margin-bottom: 22px;
     }
-
     .email-input {
       width: 100%;
       padding: 13px 16px;
@@ -94,14 +90,11 @@
       transition: border-color 0.2s;
       margin-bottom: 12px;
     }
+    .email-input:focus { outline: none; border-color: var(--ocean); }
 
-    .email-input:focus {
-      outline: none;
-      border-color: var(--ocean);
-    }
-
-    /* ── Buttons ─────────────────────────────────────────────────── */
+    /* ── Buttons ───────────────────────────────────────────────────── */
     .btn {
+      display: block;
       width: 100%;
       padding: 14px;
       border: none;
@@ -112,24 +105,20 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
     .btn-primary {
       background: linear-gradient(135deg, var(--deep-blue), var(--ocean));
       color: white;
     }
-
     .btn-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(43, 107, 138, 0.4);
+      box-shadow: 0 4px 16px rgba(43,107,138,0.4);
     }
-
     .btn-primary:disabled {
       opacity: 0.55;
       cursor: default;
       transform: none;
       box-shadow: none;
     }
-
     .btn-ghost {
       background: transparent;
       color: var(--ocean);
@@ -139,50 +128,140 @@
       font-size: 0.9rem;
       letter-spacing: 0;
     }
-
     .btn-ghost:hover { border-color: var(--ocean); }
 
-    /* ── Status cards (link-sent, completing, rejected, error) ────── */
-    .status-card { text-align: center; }
+    /* Decline button — same size as Yes but subdued */
+    .btn-no {
+      background: transparent;
+      color: var(--muted);
+      border: 2px solid var(--light-gray);
+      margin-top: 10px;
+    }
+    .btn-no:hover { border-color: var(--muted); color: var(--dark); }
 
+    /* ── Status cards ──────────────────────────────────────────────── */
+    .status-card { text-align: center; }
     .status-icon {
       font-size: 2.8rem;
       margin-bottom: 14px;
       display: block;
     }
-
     .status-card h2 {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.9rem;
       color: var(--deep-blue);
       margin-bottom: 10px;
     }
-
     .status-card p {
       color: var(--muted);
       font-size: 0.95rem;
       line-height: 1.65;
     }
-
     .status-card p.error-text { color: var(--error); }
 
-    /* ── Sender footnote ──────────────────────────────────────────── */
+    /* ── Sender footnote ───────────────────────────────────────────── */
     .sender-note {
       margin-top: 18px;
       font-size: 0.76rem;
       color: #aaa;
       line-height: 1.5;
     }
+    .sender-note code { font-size: 0.73rem; color: #888; }
 
-    .sender-note code {
-      font-size: 0.73rem;
-      color: #888;
+    /* ── RSVP card ─────────────────────────────────────────────────── */
+    .rsvp-card {
+      max-width: 440px;
+      text-align: center;
+    }
+    .rsvp-greeting {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--deep-blue);
+      margin-bottom: 8px;
+    }
+    .rsvp-intro {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 24px;
     }
 
-    /* ── App skeleton (post-auth) ─────────────────────────────────── */
-    .app-screen .inner {
+    /* ── Banner (error feedback) ───────────────────────────────────── */
+    .banner {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .banner-error {
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+    .banner-hidden { display: none; }
+
+    /* ── Notes section ─────────────────────────────────────────────── */
+    .notes-divider {
+      border: none;
+      border-top: 1px solid var(--light-gray);
+      margin: 24px 0 18px;
+    }
+    .notes-label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-align: left;
+    }
+    .notes-textarea {
       width: 100%;
-      max-width: 580px;
+      padding: 12px 14px;
+      border: 2px solid var(--light-gray);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color 0.2s;
+      color: var(--dark);
+    }
+    .notes-textarea:focus { outline: none; border-color: var(--ocean); }
+    .notes-textarea::placeholder { color: #bbb; }
+
+    /* ── Inline text link ──────────────────────────────────────────── */
+    .text-link {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      margin-top: 16px;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+    .text-link:hover { color: var(--ocean); text-decoration: underline; }
+
+    /* ── Decline screen copy ───────────────────────────────────────── */
+    .decline-copy {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin-bottom: 8px;
+    }
+    .decline-copy em {
+      font-style: italic;
+      color: var(--ocean);
+    }
+
+    /* ── App scaffold (voyage page) ────────────────────────────────── */
+    .voyage-screen { align-items: flex-start; padding-top: 40px; }
+    .voyage-screen .inner {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
       animation: fadeUp 0.4s ease-out;
     }
 
@@ -190,10 +269,8 @@
       text-align: center;
       margin-bottom: 32px;
     }
-
     .app-header .brand-title { font-size: 4rem; }
-
-    .app-header .brand-sub { margin-bottom: 14px; }
+    .app-header .brand-sub   { margin-bottom: 14px; }
 
     .user-bar {
       display: flex;
@@ -201,7 +278,6 @@
       align-items: center;
       gap: 10px;
     }
-
     .user-badge {
       background: var(--deep-blue);
       color: white;
@@ -210,7 +286,6 @@
       font-size: 0.85rem;
       font-weight: 600;
     }
-
     .sign-out-btn {
       background: transparent;
       border: 2px solid var(--light-gray);
@@ -223,32 +298,40 @@
       cursor: pointer;
       transition: border-color 0.2s;
     }
-
     .sign-out-btn:hover { border-color: var(--ocean); }
 
     .placeholder-card {
       background: white;
       border-radius: 16px;
       padding: 56px 40px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
       text-align: center;
+      margin-bottom: 16px;
     }
-
     .placeholder-card .status-icon { font-size: 3.2rem; }
-
     .placeholder-card h2 {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 2rem;
       color: var(--deep-blue);
       margin-bottom: 12px;
     }
-
     .placeholder-card p {
       color: var(--muted);
       line-height: 1.65;
       max-width: 380px;
-      margin: 0 auto;
+      margin: 0 auto 20px;
     }
+    .change-rsvp-link {
+      display: inline-block;
+      color: var(--ocean);
+      font-size: 0.875rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-decoration: underline;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .change-rsvp-link:hover { color: var(--deep-blue); }
 
     @media (min-width: 600px) {
       .app-header .brand-title { font-size: 5rem; }
@@ -257,7 +340,7 @@
 </head>
 <body>
 
-  <!-- ── Screen: loading (initial) ──────────────────────────────── -->
+  <!-- ── Screen: loading ─────────────────────────────────────────── -->
   <div class="screen active" id="screenLoading">
     <div class="card status-card">
       <span class="status-icon">⛵</span>
@@ -266,7 +349,7 @@
     </div>
   </div>
 
-  <!-- ── Screen: auth form ────────────────────────────────────────── -->
+  <!-- ── Screen: auth form ───────────────────────────────────────── -->
   <div class="screen auth-screen" id="screenAuth">
     <div class="card">
       <p class="brand-title">Nassim's Folly</p>
@@ -291,7 +374,7 @@
     </div>
   </div>
 
-  <!-- ── Screen: link sent ─────────────────────────────────────────── -->
+  <!-- ── Screen: link sent ───────────────────────────────────────── -->
   <div class="screen" id="screenLinkSent">
     <div class="card status-card">
       <span class="status-icon">📬</span>
@@ -306,7 +389,7 @@
     </div>
   </div>
 
-  <!-- ── Screen: completing sign-in ────────────────────────────────── -->
+  <!-- ── Screen: completing sign-in ─────────────────────────────── -->
   <div class="screen" id="screenCompleting">
     <div class="card status-card">
       <span class="status-icon">⏳</span>
@@ -315,7 +398,7 @@
     </div>
   </div>
 
-  <!-- ── Screen: not on allowlist ──────────────────────────────────── -->
+  <!-- ── Screen: not on allowlist ───────────────────────────────── -->
   <div class="screen" id="screenRejected">
     <div class="card status-card">
       <span class="status-icon">🚢</span>
@@ -330,7 +413,7 @@
     </div>
   </div>
 
-  <!-- ── Screen: error ─────────────────────────────────────────────── -->
+  <!-- ── Screen: error ───────────────────────────────────────────── -->
   <div class="screen" id="screenError">
     <div class="card status-card">
       <span class="status-icon">⚠️</span>
@@ -342,29 +425,72 @@
     </div>
   </div>
 
-  <!-- ── Screen: signed-in skeleton ───────────────────────────────── -->
-  <div class="screen app-screen" id="screenApp">
+  <!-- ── Screen: RSVP form (status = pending) ───────────────────── -->
+  <div class="screen" id="screenRSVP">
+    <div class="card rsvp-card">
+      <p class="brand-title">Nassim's Folly</p>
+      <p class="brand-sub">with Roberto</p>
+      <h2 class="rsvp-greeting" id="rsvpGreeting">Hello!</h2>
+      <p class="rsvp-intro">
+        Robert and Nassim are taking over a place in Tenerife, 25 May to 8 June 2027.
+        Are you in?
+      </p>
+      <div id="rsvpBanner" class="banner banner-hidden" role="alert"></div>
+      <button class="btn btn-primary" id="btnYes">Yes, we're in</button>
+      <button class="btn btn-no" id="btnNo">Sadly, we can't</button>
+      <hr class="notes-divider">
+      <label class="notes-label" for="rsvpNotes">Anything to add? (optional)</label>
+      <textarea
+        class="notes-textarea"
+        id="rsvpNotes"
+        maxlength="1024"
+        placeholder="Dietary needs, travel questions, a friendly note to J.D.M. …"
+      ></textarea>
+      <button class="text-link" id="rsvpSignOutBtn">Sign out</button>
+    </div>
+  </div>
+
+  <!-- ── Screen: declined (status = no) ─────────────────────────── -->
+  <div class="screen" id="screenDeclined">
+    <div class="card status-card">
+      <span class="status-icon">⚓</span>
+      <h2>We'll miss you aboard</h2>
+      <p class="decline-copy">
+        The Captain has logged your regrets with a mournful sigh and a very small
+        glass of something Canarian.<br><br>
+        <em>"The greatest voyages are the ones that almost happened."<br>
+        — J.D.M., unverified</em>
+      </p>
+      <button class="btn btn-ghost" id="btnChangedMindNo">
+        Wait, I changed my mind
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Screen: voyage page (status = yes) — Step B expands this ─ -->
+  <div class="screen voyage-screen" id="screenVoyage">
     <div class="inner">
       <header class="app-header">
         <p class="brand-title">Nassim's Folly</p>
         <p class="brand-sub">with Roberto</p>
         <div class="user-bar">
-          <span class="user-badge" id="signedInName"></span>
-          <button class="sign-out-btn" id="signOutBtn">Sign out</button>
+          <span class="user-badge" id="voyageUserName"></span>
+          <button class="sign-out-btn" id="voyageSignOutBtn">Sign out</button>
         </div>
       </header>
       <div class="placeholder-card">
         <span class="status-icon">⛵</span>
-        <h2>The voyage is being charted</h2>
+        <h2>You're aboard!</h2>
         <p>
-          You're on the list. The full experience — RSVP, the Captain's Diary,
-          itinerary — is being assembled and will be ready soon.
+          The full voyage experience — diary, activities, the property — is being
+          charted and will be ready soon.
         </p>
+        <button class="change-rsvp-link" id="btnChangeFromYes">Change my RSVP</button>
       </div>
     </div>
   </div>
 
-  <!-- ── Firebase SDK ───────────────────────────────────────────────── -->
+  <!-- ── Firebase SDK ────────────────────────────────────────────── -->
   <script type="module">
     import { initializeApp }
       from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -372,13 +498,10 @@
       getAuth, sendSignInLinkToEmail, isSignInWithEmailLink,
       signInWithEmailLink, onAuthStateChanged, signOut
     } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, get, set }
+    import { getDatabase, ref, get, set, update }
       from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     // ── Firebase config ───────────────────────────────────────────
-    // Replace placeholder values from Firebase Console → Project settings
-    // → Your apps after creating the wal-nassims-folly project.
-    // See .claude/instructions/firebase-setup.md for steps.
     const firebaseConfig = {
       apiKey:            'AIzaSyBTa08k41HZeCO1OdIByPEWc8wCwKAzEcQ',
       authDomain:        'wal-nassims-folly.firebaseapp.com',
@@ -389,16 +512,13 @@
       appId:             '1:224165103778:web:561f1fe488cdbe7815effb'
     };
 
-    // For local testing, temporarily change this to 'http://localhost:PORT/'
+    // For local testing: temporarily change to 'http://localhost:PORT/'
     // and add 'localhost' to Firebase Console → Authentication → Authorized domains.
     const LIVE_URL = 'https://rchalanc-crypto.github.io/APP_Dev/apps/nassims-folly/';
 
-    const actionCodeSettings = {
-      url: LIVE_URL,
-      handleCodeInApp: true
-    };
+    const actionCodeSettings = { url: LIVE_URL, handleCodeInApp: true };
 
-    // ── Init ───────────────────────────────────────────────────────
+    // ── Init ─────────────────────────────────────────────────────
     let auth, db;
     try {
       const app = initializeApp(firebaseConfig);
@@ -408,7 +528,12 @@
       console.error('Firebase init failed:', err);
     }
 
-    // ── Helpers ────────────────────────────────────────────────────
+    // ── Session state ─────────────────────────────────────────────
+    let currentUser   = null;
+    let currentName   = '';
+    let currentStatus = 'pending';
+
+    // ── Helpers ───────────────────────────────────────────────────
 
     window.showScreen = function(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -418,6 +543,16 @@
     function showError(msg) {
       document.getElementById('errorMsg').textContent = msg;
       showScreen('screenError');
+    }
+
+    function showBanner(msg) {
+      const el = document.getElementById('rsvpBanner');
+      el.textContent = msg;
+      el.className = 'banner banner-error';
+    }
+
+    function hideBanner() {
+      document.getElementById('rsvpBanner').className = 'banner banner-hidden';
     }
 
     async function sha256hex(str) {
@@ -430,7 +565,17 @@
         .join('');
     }
 
-    // ── Allowlist check + invitee provisioning ─────────────────────
+    function routeByStatus(status) {
+      if (status === 'yes') {
+        showScreen('screenVoyage');
+      } else if (status === 'no') {
+        showScreen('screenDeclined');
+      } else {
+        showScreen('screenRSVP');
+      }
+    }
+
+    // ── Allowlist check + invitee provisioning + routing ──────────
 
     async function checkAllowlistAndEnter(user) {
       const hash = await sha256hex(user.email);
@@ -451,8 +596,12 @@
       }
 
       const allow = allowSnap.val();
+      currentUser = user;
+      currentName = allow.name || user.email;
 
-      // Provision /invitees/{uid} on first sign-in
+      document.getElementById('rsvpGreeting').textContent  = `Hello, ${currentName}.`;
+      document.getElementById('voyageUserName').textContent = currentName;
+
       const inviteeRef = ref(db, `invitees/${user.uid}`);
       try {
         const invSnap = await get(inviteeRef);
@@ -463,27 +612,82 @@
             status:     'pending',
             party_size: allow.party_size || 1
           });
+          currentStatus = 'pending';
+        } else {
+          currentStatus = invSnap.val().status || 'pending';
         }
       } catch (err) {
-        // Non-fatal: invitee record may already exist or rules may not yet allow write.
         console.error('Invitee provision error:', err);
+        currentStatus = 'pending';
       }
 
-      document.getElementById('signedInName').textContent = allow.name || user.email;
-      showScreen('screenApp');
+      routeByStatus(currentStatus);
     }
 
-    // ── Page init ──────────────────────────────────────────────────
+    // ── RSVP submission (optimistic) ──────────────────────────────
+
+    async function submitRSVP(newStatus) {
+      const prevStatus = currentStatus;
+      const notes      = document.getElementById('rsvpNotes').value.trim();
+      const now        = new Date().toISOString().slice(0, 19) + 'Z';
+
+      hideBanner();
+      currentStatus = newStatus;
+      routeByStatus(newStatus);
+
+      const payload = { status: newStatus, responded_at: now };
+      if (notes) payload.notes = notes;
+
+      try {
+        await update(ref(db, `invitees/${currentUser.uid}`), payload);
+      } catch (err) {
+        console.error('RSVP write error:', err);
+        currentStatus = prevStatus;
+        routeByStatus(prevStatus);
+        showBanner('Could not save your RSVP — check your connection and try again.');
+      }
+    }
+
+    // ── Revert to pending ("changed my mind", both directions) ────
+
+    async function revertToPending() {
+      const prevStatus = currentStatus;
+      const now        = new Date().toISOString().slice(0, 19) + 'Z';
+
+      currentStatus = 'pending';
+      showScreen('screenRSVP');
+
+      try {
+        await update(ref(db, `invitees/${currentUser.uid}`), {
+          status: 'pending',
+          responded_at: now
+        });
+      } catch (err) {
+        console.error('RSVP revert error:', err);
+        currentStatus = prevStatus;
+        routeByStatus(prevStatus);
+        showBanner('Could not update your RSVP — please try again.');
+      }
+    }
+
+    // ── Sign out ──────────────────────────────────────────────────
+
+    async function doSignOut() {
+      await signOut(auth);
+      currentUser   = null;
+      currentName   = '';
+      currentStatus = 'pending';
+      showScreen('screenAuth');
+    }
+
+    // ── Page init ─────────────────────────────────────────────────
 
     if (!auth) {
-      // Config not filled in yet — show auth form but send will fail gracefully
       showScreen('screenAuth');
     } else if (isSignInWithEmailLink(auth, window.location.href)) {
-      // Completing sign-in from email link
       showScreen('screenCompleting');
       let email = localStorage.getItem('emailForSignIn');
       if (!email) {
-        // Cross-device sign-in: user clicked on a different device
         email = window.prompt('Please confirm your email address to finish signing in:');
       }
       if (!email) {
@@ -500,14 +704,13 @@
             if (err.code === 'auth/invalid-action-code') {
               showError('This sign-in link has expired or already been used. Please request a new one.');
             } else if (err.code === 'auth/invalid-email') {
-              showError('The email doesn\'t match this sign-in link. Please try again.');
+              showError("The email doesn't match this sign-in link. Please try again.");
             } else {
               showError('Sign-in failed: ' + err.message);
             }
           });
       }
     } else {
-      // Normal page load — check existing session
       onAuthStateChanged(auth, async user => {
         if (user) {
           showScreen('screenCompleting');
@@ -518,12 +721,12 @@
       });
     }
 
-    // ── Send sign-in link ──────────────────────────────────────────
+    // ── Auth form ─────────────────────────────────────────────────
 
     document.getElementById('authFormEl').addEventListener('submit', async e => {
       e.preventDefault();
       if (!auth) {
-        showError('Firebase is not configured yet. Fill in the firebaseConfig values in index.html.');
+        showError('Firebase is not configured yet.');
         return;
       }
       const email = document.getElementById('emailInput').value.trim().toLowerCase();
@@ -543,21 +746,26 @@
         btn.disabled = false;
         btn.textContent = 'Send me a link';
         if (err.code === 'auth/invalid-email') {
-          showError('That doesn\'t look like a valid email address.');
+          showError("That doesn't look like a valid email address.");
         } else if (err.code === 'auth/unauthorized-continue-uri') {
-          showError('This domain isn\'t authorised yet. Add it in Firebase Console → Authentication → Authorized domains.');
+          showError("This domain isn't authorised yet — add it in Firebase Console → Authentication → Authorized domains.");
         } else {
           showError('Could not send the link: ' + err.message);
         }
       }
     });
 
-    // ── Sign out ───────────────────────────────────────────────────
+    // ── Event listeners ───────────────────────────────────────────
 
-    document.getElementById('signOutBtn').addEventListener('click', async () => {
-      await signOut(auth);
-      showScreen('screenAuth');
-    });
+    document.getElementById('btnYes').addEventListener('click', () => submitRSVP('yes'));
+    document.getElementById('btnNo').addEventListener('click',  () => submitRSVP('no'));
+
+    document.getElementById('btnChangedMindNo').addEventListener('click',  revertToPending);
+    document.getElementById('btnChangeFromYes').addEventListener('click',  revertToPending);
+
+    document.getElementById('rsvpSignOutBtn').addEventListener('click',    doSignOut);
+    document.getElementById('voyageSignOutBtn').addEventListener('click',   doSignOut);
+
   </script>
 </body>
 </html>
