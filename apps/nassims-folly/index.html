@@ -1235,6 +1235,8 @@
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(btn.dataset.panel).classList.add('active');
+        if (btn.dataset.panel === 'panelRSVP')       loadRSVPTab();
+        if (btn.dataset.panel === 'panelAllowlist')  loadAllowlistTab();
       });
     });
 
@@ -1329,6 +1331,10 @@
     document.getElementById('footerSignOutBtn').addEventListener('click',  doSignOut);
     document.getElementById('adminSignOutBtn').addEventListener('click',   doSignOut);
     document.getElementById('adminBackBtn').addEventListener('click',      leaveAdmin);
+    document.getElementById('adminLink').addEventListener('click', e => {
+      e.preventDefault();
+      showAdminDashboard();
+    });
 
   </script>
 </body>
