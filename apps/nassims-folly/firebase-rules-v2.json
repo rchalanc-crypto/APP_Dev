@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "invitees": {
+      ".read":  "auth != null && root.child('admin/' + auth.uid).exists()",
+      "$uid": {
+        ".read":  "auth != null && (auth.uid == $uid || root.child('admin/' + auth.uid).exists())",
+        ".write": "auth != null && (auth.uid == $uid || root.child('admin/' + auth.uid).exists())",
+        ".validate": "newData.hasChildren(['email', 'status'])",
+        "email":        { ".validate": "newData.isString() && newData.val().length < 256" },
+        "name":         { ".validate": "newData.isString() && newData.val().length < 128" },
+        "party_size":   { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 2" },
+        "status":       { ".validate": "newData.isString() && (newData.val() == 'pending' || newData.val() == 'yes' || newData.val() == 'no')" },
+        "responded_at": { ".validate": "newData.isString() && newData.val().length < 32" },
+        "notes":        { ".validate": "newData.isString() && newData.val().length < 1024" },
+        "$other":       { ".validate": false }
+      }
+    },
+    "allowlist": {
+      ".read":  "auth != null && root.child('admin/' + auth.uid).exists()",
+      ".write": "auth != null && root.child('admin/' + auth.uid).exists()",
+      "$emailHash": {
+        ".read":      "auth != null",
+        "name":       { ".validate": "newData.isString() && newData.val().length < 128" },
+        "email":      { ".validate": "newData.isString() && newData.val().length < 256" },
+        "party_size": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 2" },
+        "$other":     { ".validate": false }
+      }
+    },
+    "content": {
+      ".read":  "auth != null && root.child('invitees/' + auth.uid + '/status').val() == 'yes'",
+      ".write": "auth != null && root.child('admin/' + auth.uid).exists()"
+    },
+    "admin": {
+      ".read":  "auth != null && root.child('admin/' + auth.uid).exists()",
+      ".write": false
+    }
+  }
+}

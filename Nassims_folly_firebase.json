@@ -1,0 +1,14 @@
+{
+  "allowlist": {
+    "76b4975b7834fffe43adc20d8974acf80bd5ed99ed940bd598c4146df1269e07": {
+      "name": "Robert Chalanchuk",
+      "email": "rchalanc@gmail.com",
+      "party_size": 1
+    },
+    "3c2a96b398030bee53c668ad0eeea36508ee8ec1f90fcdde60a164127d1f7fff": {
+      "name": "Nassim Rowhani",
+      "email": "nassim.rowhani@icloud.com",
+      "party_size": 1
+    }
+  }
+}
