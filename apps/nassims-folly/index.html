@@ -130,7 +130,6 @@
     }
     .btn-ghost:hover { border-color: var(--ocean); }
 
-    /* Decline button — same size as Yes but subdued */
     .btn-no {
       background: transparent;
       color: var(--muted);
@@ -169,10 +168,7 @@
     .sender-note code { font-size: 0.73rem; color: #888; }
 
     /* ── RSVP card ─────────────────────────────────────────────────── */
-    .rsvp-card {
-      max-width: 440px;
-      text-align: center;
-    }
+    .rsvp-card { max-width: 440px; text-align: center; }
     .rsvp-greeting {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 2rem;
@@ -186,7 +182,7 @@
       margin-bottom: 24px;
     }
 
-    /* ── Banner (error feedback) ───────────────────────────────────── */
+    /* ── Banner ────────────────────────────────────────────────────── */
     .banner {
       padding: 12px 16px;
       border-radius: 8px;
@@ -229,7 +225,7 @@
     .notes-textarea:focus { outline: none; border-color: var(--ocean); }
     .notes-textarea::placeholder { color: #bbb; }
 
-    /* ── Inline text link ──────────────────────────────────────────── */
+    /* ── Text link ─────────────────────────────────────────────────── */
     .text-link {
       background: none;
       border: none;
@@ -244,20 +240,21 @@
     }
     .text-link:hover { color: var(--ocean); text-decoration: underline; }
 
-    /* ── Decline screen copy ───────────────────────────────────────── */
+    /* ── Decline screen ────────────────────────────────────────────── */
     .decline-copy {
       color: var(--muted);
       font-size: 0.95rem;
       line-height: 1.65;
       margin-bottom: 8px;
     }
-    .decline-copy em {
-      font-style: italic;
-      color: var(--ocean);
-    }
+    .decline-copy em { font-style: italic; color: var(--ocean); }
 
-    /* ── App scaffold (voyage page) ────────────────────────────────── */
-    .voyage-screen { align-items: flex-start; padding-top: 40px; }
+    /* ── Voyage page ───────────────────────────────────────────────── */
+    .voyage-screen {
+      align-items: flex-start;
+      padding-top: 40px;
+      padding-bottom: 60px;
+    }
     .voyage-screen .inner {
       width: 100%;
       max-width: 640px;
@@ -300,41 +297,128 @@
     }
     .sign-out-btn:hover { border-color: var(--ocean); }
 
-    .placeholder-card {
+    /* ── Countdown / hero ──────────────────────────────────────────── */
+    .voyage-hero {
+      text-align: center;
       background: white;
       border-radius: 16px;
-      padding: 56px 40px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      text-align: center;
+      padding: 40px 32px 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+    .voyage-tagline {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
+    }
+    .countdown-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 4px;
       margin-bottom: 16px;
     }
-    .placeholder-card .status-icon { font-size: 3.2rem; }
-    .placeholder-card h2 {
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 72px;
+    }
+    .countdown-num {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem;
+      font-size: 4.5rem;
+      line-height: 1;
       color: var(--deep-blue);
-      margin-bottom: 12px;
     }
-    .placeholder-card p {
+    .countdown-label {
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--azure);
+      margin-top: 4px;
+    }
+    .countdown-sep {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      color: var(--sand);
+      line-height: 1.15;
+      padding: 0 2px;
+    }
+    .voyage-date-note {
+      font-size: 0.75rem;
       color: var(--muted);
-      line-height: 1.65;
-      max-width: 380px;
-      margin: 0 auto 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
-    .change-rsvp-link {
-      display: inline-block;
-      color: var(--ocean);
-      font-size: 0.875rem;
-      cursor: pointer;
+
+    /* ── Content sections ──────────────────────────────────────────── */
+    .voyage-section { margin-bottom: 20px; }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--deep-blue);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .section-placeholder {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      font-style: italic;
+    }
+
+    /* ── Fun fact ──────────────────────────────────────────────────── */
+    .fun-fact-strip {
+      background: var(--sand);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+    }
+    .fun-fact-text {
+      color: var(--deep-blue);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ── Voyage footer ─────────────────────────────────────────────── */
+    .voyage-footer { text-align: center; padding-top: 8px; }
+    .voyage-disclaimer {
+      font-size: 0.72rem;
+      color: #bbb;
+      margin-bottom: 10px;
+    }
+    .voyage-footer-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .footer-link {
       background: none;
       border: none;
-      text-decoration: underline;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
       font-family: 'DM Sans', sans-serif;
+      padding: 0;
+      text-decoration: none;
     }
-    .change-rsvp-link:hover { color: var(--deep-blue); }
+    .footer-link:hover { color: var(--ocean); text-decoration: underline; }
+    .footer-sep { color: var(--light-gray); font-size: 0.85rem; }
 
     @media (min-width: 600px) {
       .app-header .brand-title { font-size: 5rem; }
+      .countdown-num  { font-size: 5.5rem; }
+      .countdown-unit { min-width: 90px; }
     }
   </style>
 </head>
@@ -437,7 +521,7 @@
       </p>
       <div id="rsvpBanner" class="banner banner-hidden" role="alert"></div>
       <button class="btn btn-primary" id="btnYes">Yes, we're in</button>
-      <button class="btn btn-no" id="btnNo">Sadly, we can't</button>
+      <button class="btn btn-no"      id="btnNo">Sadly, we can't</button>
       <hr class="notes-divider">
       <label class="notes-label" for="rsvpNotes">Anything to add? (optional)</label>
       <textarea
@@ -467,9 +551,10 @@
     </div>
   </div>
 
-  <!-- ── Screen: voyage page (status = yes) — Step B expands this ─ -->
+  <!-- ── Screen: voyage page (status = yes) ─────────────────────── -->
   <div class="screen voyage-screen" id="screenVoyage">
     <div class="inner">
+
       <header class="app-header">
         <p class="brand-title">Nassim's Folly</p>
         <p class="brand-sub">with Roberto</p>
@@ -478,15 +563,78 @@
           <button class="sign-out-btn" id="voyageSignOutBtn">Sign out</button>
         </div>
       </header>
-      <div class="placeholder-card">
-        <span class="status-icon">⛵</span>
-        <h2>You're aboard!</h2>
-        <p>
-          The full voyage experience — diary, activities, the property — is being
-          charted and will be ready soon.
-        </p>
-        <button class="change-rsvp-link" id="btnChangeFromYes">Change my RSVP</button>
+
+      <!-- Hero: countdown -->
+      <section class="voyage-hero">
+        <p class="voyage-tagline">The chronicler is at sea.</p>
+        <div class="countdown-wrap" aria-label="Countdown to departure">
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cdDays">--</span>
+            <span class="countdown-label">Days</span>
+          </div>
+          <span class="countdown-sep" aria-hidden="true">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cdHours">--</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          <span class="countdown-sep" aria-hidden="true">:</span>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cdMinutes">--</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+        </div>
+        <p class="voyage-date-note">Until 25 May 2027 · Tenerife</p>
+      </section>
+
+      <!-- The Property -->
+      <section class="voyage-section">
+        <h3 class="section-title">The Property</h3>
+        <div class="section-card">
+          <p class="section-placeholder">
+            Our chronicler is still scouting. Watch this space.
+          </p>
+        </div>
+      </section>
+
+      <!-- The Diary -->
+      <section class="voyage-section">
+        <h3 class="section-title">The Captain's Diary</h3>
+        <div class="section-card">
+          <p class="section-placeholder">
+            No entries yet. J.D.M. has not yet found a quill that doesn't leak.
+          </p>
+        </div>
+      </section>
+
+      <!-- Activities -->
+      <section class="voyage-section">
+        <h3 class="section-title">Activities</h3>
+        <div class="section-card">
+          <p class="section-placeholder">
+            The itinerary is being charted. Stand by.
+          </p>
+        </div>
+      </section>
+
+      <!-- Fun fact (hidden until /content/fun_facts is populated) -->
+      <div class="fun-fact-strip" id="funFactStrip" style="display:none">
+        <p class="fun-fact-text" id="funFactText"></p>
       </div>
+
+      <!-- Footer -->
+      <footer class="voyage-footer">
+        <p class="voyage-disclaimer">
+          Private. For invited guests only. Not responsible for piracy or J.D.M.'s footnotes.
+        </p>
+        <div class="voyage-footer-links">
+          <button class="footer-link" id="voyageChangeRSVP">Change my RSVP</button>
+          <span class="footer-sep">·</span>
+          <button class="footer-link" id="footerSignOutBtn">Sign out</button>
+          <span class="footer-sep" id="adminSep" style="display:none">·</span>
+          <a class="footer-link" id="adminLink" href="#admin" style="display:none">Admin</a>
+        </div>
+      </footer>
+
     </div>
   </div>
 
@@ -513,7 +661,7 @@
     };
 
     // For local testing: temporarily change to 'http://localhost:PORT/'
-    // and add 'localhost' to Firebase Console → Authentication → Authorized domains.
+    // and add localhost to Firebase Console → Authentication → Authorized domains.
     const LIVE_URL = 'https://rchalanc-crypto.github.io/APP_Dev/apps/nassims-folly/';
 
     const actionCodeSettings = { url: LIVE_URL, handleCodeInApp: true };
@@ -532,6 +680,84 @@
     let currentUser   = null;
     let currentName   = '';
     let currentStatus = 'pending';
+    let isAdmin       = false;
+    let adminChecked  = false;
+
+    // ── Countdown ─────────────────────────────────────────────────
+    // 25 May 2027 00:00:00 in Atlantic/Canary (WEST = UTC+1 in summer).
+    // ISO offset string is unambiguous — no reliance on browser local timezone.
+    const VOYAGE_TARGET   = new Date('2027-05-25T00:00:00+01:00');
+    let   countdownInterval = null;
+
+    function updateCountdown() {
+      const diff = VOYAGE_TARGET.getTime() - Date.now();
+      if (diff <= 0) {
+        document.getElementById('cdDays').textContent    = '0';
+        document.getElementById('cdHours').textContent   = '00';
+        document.getElementById('cdMinutes').textContent = '00';
+        return;
+      }
+      const totalMins  = Math.floor(diff / 60000);
+      const mins       = totalMins % 60;
+      const totalHours = Math.floor(totalMins / 60);
+      const hrs        = totalHours % 24;
+      const days       = Math.floor(totalHours / 24);
+      document.getElementById('cdDays').textContent    = days;
+      document.getElementById('cdHours').textContent   = String(hrs).padStart(2, '0');
+      document.getElementById('cdMinutes').textContent = String(mins).padStart(2, '0');
+    }
+
+    // ── Admin check (once per session, cached) ────────────────────
+    async function checkAdmin() {
+      try {
+        const snap = await get(ref(db, `admin/${currentUser.uid}`));
+        isAdmin = snap.exists();
+      } catch (_) {
+        isAdmin = false; // permission denied = not an admin
+      }
+      if (isAdmin) {
+        document.getElementById('adminLink').style.display = '';
+        document.getElementById('adminSep').style.display  = '';
+      }
+    }
+
+    // ── Fun fact ──────────────────────────────────────────────────
+    async function loadFunFact() {
+      try {
+        const snap = await get(ref(db, 'content/fun_facts'));
+        if (!snap.exists()) return;
+        const facts = snap.val();
+        const keys  = Object.keys(facts);
+        if (!keys.length) return;
+
+        const seen   = JSON.parse(localStorage.getItem('nf_seen_facts') || '[]');
+        const unseen = keys.filter(k => !seen.includes(k));
+        const pool   = unseen.length ? unseen : keys;
+        const pick   = pool[Math.floor(Math.random() * pool.length)];
+
+        const newSeen = [...seen.filter(k => keys.includes(k)), pick].slice(-30);
+        localStorage.setItem('nf_seen_facts', JSON.stringify(newSeen));
+
+        document.getElementById('funFactText').textContent =
+          `A fact about Tenerife: ${facts[pick]}`;
+        document.getElementById('funFactStrip').style.display = '';
+      } catch (_) {
+        // Non-fatal — fun fact is optional
+      }
+    }
+
+    // ── Voyage page init ──────────────────────────────────────────
+    function showVoyagePage() {
+      showScreen('screenVoyage');
+      updateCountdown();
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateCountdown, 60000);
+      if (!adminChecked) {
+        adminChecked = true;
+        checkAdmin();
+      }
+      loadFunFact();
+    }
 
     // ── Helpers ───────────────────────────────────────────────────
 
@@ -567,7 +793,7 @@
 
     function routeByStatus(status) {
       if (status === 'yes') {
-        showScreen('screenVoyage');
+        showVoyagePage();
       } else if (status === 'no') {
         showScreen('screenDeclined');
       } else {
@@ -654,6 +880,8 @@
       const prevStatus = currentStatus;
       const now        = new Date().toISOString().slice(0, 19) + 'Z';
 
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
       currentStatus = 'pending';
       showScreen('screenRSVP');
 
@@ -673,10 +901,13 @@
     // ── Sign out ──────────────────────────────────────────────────
 
     async function doSignOut() {
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
       await signOut(auth);
       currentUser   = null;
       currentName   = '';
       currentStatus = 'pending';
+      isAdmin       = false;
+      adminChecked  = false;
       showScreen('screenAuth');
     }
 
@@ -725,10 +956,7 @@
 
     document.getElementById('authFormEl').addEventListener('submit', async e => {
       e.preventDefault();
-      if (!auth) {
-        showError('Firebase is not configured yet.');
-        return;
-      }
+      if (!auth) { showError('Firebase is not configured yet.'); return; }
       const email = document.getElementById('emailInput').value.trim().toLowerCase();
       if (!email) return;
 
@@ -757,14 +985,13 @@
 
     // ── Event listeners ───────────────────────────────────────────
 
-    document.getElementById('btnYes').addEventListener('click', () => submitRSVP('yes'));
-    document.getElementById('btnNo').addEventListener('click',  () => submitRSVP('no'));
-
-    document.getElementById('btnChangedMindNo').addEventListener('click',  revertToPending);
-    document.getElementById('btnChangeFromYes').addEventListener('click',  revertToPending);
-
-    document.getElementById('rsvpSignOutBtn').addEventListener('click',    doSignOut);
-    document.getElementById('voyageSignOutBtn').addEventListener('click',   doSignOut);
+    document.getElementById('btnYes').addEventListener('click',          () => submitRSVP('yes'));
+    document.getElementById('btnNo').addEventListener('click',           () => submitRSVP('no'));
+    document.getElementById('btnChangedMindNo').addEventListener('click', revertToPending);
+    document.getElementById('voyageChangeRSVP').addEventListener('click', revertToPending);
+    document.getElementById('rsvpSignOutBtn').addEventListener('click',   doSignOut);
+    document.getElementById('voyageSignOutBtn').addEventListener('click',  doSignOut);
+    document.getElementById('footerSignOutBtn').addEventListener('click',  doSignOut);
 
   </script>
 </body>
