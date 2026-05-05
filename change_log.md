@@ -6,6 +6,63 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-05] — nassims-folly Phase 2: RSVP + Voyage Skeleton + Admin Dashboard [COMPLETED]
+
+### Summary
+
+**[FEATURE] Phase 2 complete — RSVP flow, voyage page skeleton, admin dashboard, tightened Firebase rules.**
+
+**RSVP screen (§2.1)**
+- Three-state machine driven by `/invitees/{uid}/status`: `pending` (Yes/No buttons + optional notes), `yes` (auto-routes to voyage page), `no` (warm decline screen with footer link)
+- Optimistic UI: routes immediately on submit, writes `{status, responded_at, notes}` to Firebase in background, reverts with banner on failure
+- Bidirectional "change my mind" links from both yes and no states back to pending
+
+**Voyage page skeleton (§2.2)**
+- Hero: 60-second countdown to 2027-05-25 00:00 WEST (explicit ISO offset `+01:00`, not browser-local)
+- The Property: placeholder card pending Phase 3 content
+- The Diary: placeholder pending Phase 3 content
+- Activities: placeholder pending Phase 4 content
+- Footer: fun fact pulled from `/content/fun_facts` at random; avoids last 30 seen via localStorage; falls back to a seeded fact until pool is populated
+- Admin link in footer: shown only to admins; checked once per session via `/admin/{uid}` read (permission-denied caught silently for non-admins)
+
+**Admin dashboard (§2.3)**
+- Hash-routed at `#admin`; gated by `isAdmin` session flag; `hashchange` listener handles browser back
+- RSVP tab: counts bar (Yes/No/Pending/Total), sortable table (status order: yes→no→pending, then name), click-to-expand notes rows
+- Allowlist tab: table with Remove button per row (optimistic DOM removal + Firebase `remove()`); bulk CSV add with preview/confirm flow (validates name/email/party_size, computes sha256, multi-path `update()` at db root)
+- XSS protection via `escapeHtml()` on all table rendering
+
+**Firebase rules update (§2.4 / Step D)**
+- `/invitees`: added collection-level `.read` for admins (needed by RSVP tab)
+- `/allowlist`: collection `.read` tightened from any-signed-in to admin-only; per-hash `.read` left open to any signed-in user (needed by sign-in allowlist check)
+- Rules deployed via Firebase Console paste
+
+**Security pass**
+- E1: invalid status `"maybe"` rejected by validate rule ✓
+- E2: write to `/admin/{uid}` rejected (`admin/.write: false`) ✓
+- E3: unknown field rejected (`$other: {".validate": false}`) ✓
+- E4: admin reads `/invitees` collection ✓
+- E5: non-admin read of `/invitees` denied (Simulator) ✓
+- E6: non-admin read of `/allowlist` denied (Simulator) ✓
+- No sensitive data in console output (only `console.error` with error objects)
+- README no-warranty disclaimer present
+- $0.01 budget alert active (Blaze plan, $0.00 used)
+
+**Acceptance (§2.5)**
+- All F1–F14 items confirmed; F9 verified with a real test account
+
+### Deviations from SPEC
+
+- None. All §2.1–2.4 items implemented as specified.
+
+### What's next (Phase 3)
+
+- Seed fun facts pool (~50 entries) in `/content/fun_facts` — Claude.ai chat session
+- Seed diary entries (J.D.M. voice + Deadpan First Mate) — Claude.ai chat session
+- Property section wiring (activates when `/content/property/status` flips to `confirmed`)
+- Voyage page visual pass once first content block is in (deferred from Phase 2)
+- Send real invites once test couple confirms (outside Claude Code scope)
+
+---
 ## [2026-05-04] — nassims-folly Phase B: Deploy [COMPLETED]
 
 **[DEPLOY] Wired firebaseConfig, switched GitHub Pages from Pattern A to Pattern B, ride-tracker continuity verified.**
