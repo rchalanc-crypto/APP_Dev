@@ -3,9 +3,11 @@
 A private invite-only web app for Robert and Nassim's Tenerife trip (25 May – 8 June 2027).
 Handles RSVP, a voyage countdown, the Captain's Diary, and trip activities.
 
-**Live URL:** https://rchalanc-crypto.github.io/APP_Dev/apps/nassims-folly/ _(live after Phase 1 deploy)_
+**Live URL:** https://follyintenerife.com/apps/nassims-folly/
 
-**Status:** Phase 1 — auth skeleton deployed; RSVP and content in Phase 2+.
+**Fallback URL:** https://rchalanc-crypto.github.io/APP_Dev/apps/nassims-folly/
+
+**Status:** Phase 2 complete — RSVP, voyage skeleton, admin dashboard live. Custom domain active. Email sender update in Phase 2.H.
 
 ---
 

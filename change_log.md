@@ -6,6 +6,19 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-05] — nassims-folly Phase 2.G: Custom Domain URL Cutover [COMPLETED]
+
+Phase 2.G — URL cutover: follyintenerife.com live, actionCodeSettings.url updated, Firebase authorized domains updated. github.io retained as fallback. Email sender still default firebaseapp.com — addressed in Phase 2.H.
+
+- Custom domain `follyintenerife.com` configured: DNS A records (4x GitHub Pages IPs) + CNAME `www` → `rchalanc-crypto.github.io`, all DNS-only via Cloudflare
+- GitHub Pages custom domain set; TLS cert provisioned by GitHub
+- Firebase authorized domains: `follyintenerife.com` added; `rchalanc-crypto.github.io` retained
+- `LIVE_URL` in `apps/nassims-folly/index.html` switched from `rchalanc-crypto.github.io/APP_Dev/apps/nassims-folly/` to `follyintenerife.com/apps/nassims-folly/`
+- End-to-end verified: magic link email URL confirmed `follyintenerife.com`, sign-in and voyage page load confirmed on new domain
+- github.io fallback URL still functional; ride-tracker URL untouched
+- Email sender remains `noreply@wal-nassims-folly.firebaseapp.com` (Phase 2.H)
+
+---
 ## [2026-05-05] — nassims-folly Phase 2: RSVP + Voyage Skeleton + Admin Dashboard [COMPLETED]
 
 ### Summary
