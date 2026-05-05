@@ -6,6 +6,17 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-05] — nassims-folly Phase 2.H: Custom Email Sender [COMPLETED]
+
+Phase 2.H — Custom email sender: configured Firebase Auth custom domain for follyintenerife.com. Auth emails now send from `noreply@follyintenerife.com` (was: `noreply@wal-nassims-folly.firebaseapp.com`). Required Blaze plan upgrade (already done) and DNS records at Cloudflare (TXT for SPF + Firebase verification, 2× CNAME for DKIM).
+
+- From address: `noreply@follyintenerife.com` ✓ — verified end-to-end
+- Magic link continueUrl: `follyintenerife.com/apps/nassims-folly/` ✓
+- SPF/DKIM: DNS records confirmed live via nslookup
+- Spam on first sends: expected for new sending domain — no action needed, reputation builds over time
+- Firebase platform limitation: passwordless sign-in email body, sender display name, and reply-to are NOT customizable through Firebase Console — locked by Firebase. Workaround (future): generate link via Admin SDK and send via custom SMTP (out of scope Phase 2)
+
+---
 ## [2026-05-05] — nassims-folly Phase 2.G: Custom Domain URL Cutover [COMPLETED]
 
 Phase 2.G — URL cutover: follyintenerife.com live, actionCodeSettings.url updated, Firebase authorized domains updated. github.io retained as fallback. Email sender still default firebaseapp.com — addressed in Phase 2.H.
