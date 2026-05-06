@@ -1013,14 +1013,18 @@
       tableEl.style.display = 'none';
 
       try {
-        const snap = await new Promise((res, rej) =>
-          onValue(ref(db, 'invitees'), res, rej, { onlyOnce: true })
+        const token = await currentUser.getIdToken();
+        const resp  = await fetch(
+          `https://wal-nassims-folly-default-rtdb.firebaseio.com/invitees.json?auth=${token}`
         );
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
         loadEl.style.display = 'none';
         tableEl.style.display = '';
 
-        const rows = [];
-        if (snap.exists()) snap.forEach(c => rows.push({ uid: c.key, ...c.val() }));
+        const rows = data
+          ? Object.entries(data).map(([uid, val]) => ({ uid, ...val }))
+          : [];
         renderRSVPTable(rows);
       } catch (err) {
         loadEl.className   = 'admin-error';
