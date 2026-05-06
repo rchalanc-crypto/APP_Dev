@@ -715,7 +715,7 @@
       getAuth, sendSignInLinkToEmail, isSignInWithEmailLink,
       signInWithEmailLink, onAuthStateChanged, signOut
     } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, get, set, update, remove }
+    import { getDatabase, ref, get, set, update, remove, onValue }
       from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     // ── Firebase config ───────────────────────────────────────────
@@ -1013,10 +1013,9 @@
       tableEl.style.display = 'none';
 
       try {
-        console.log('[RSVP] attempting read, uid:', currentUser?.uid);
-        const snap = await get(ref(db, 'invitees'));
-        console.log('[RSVP] snap.numChildren():', snap.numChildren());
-        console.log('[RSVP] snap.val():', JSON.stringify(snap.val()));
+        const snap = await new Promise((res, rej) =>
+          onValue(ref(db, 'invitees'), res, rej, { onlyOnce: true })
+        );
         loadEl.style.display = 'none';
         tableEl.style.display = '';
 
@@ -1024,7 +1023,6 @@
         if (snap.exists()) snap.forEach(c => rows.push({ uid: c.key, ...c.val() }));
         renderRSVPTable(rows);
       } catch (err) {
-        console.error('[RSVP] read failed, uid:', currentUser?.uid, 'error:', err.code, err.message);
         loadEl.className   = 'admin-error';
         loadEl.textContent = 'Could not load RSVP data — deploy the rules update (Step D) first.';
       }
@@ -1090,7 +1088,9 @@
 
         let emailStatusMap = {};
         try {
-          const invSnap = await get(ref(db, 'invitees'));
+          const invSnap = await new Promise((res, rej) =>
+            onValue(ref(db, 'invitees'), res, rej, { onlyOnce: true })
+          );
           if (invSnap.exists()) {
             invSnap.forEach(c => {
               const d = c.val();
