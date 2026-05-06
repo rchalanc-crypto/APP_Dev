@@ -45,6 +45,8 @@ To test locally:
 
 ## Phase map
 
-- **Phase 1 (current):** Skeleton + auth. Signed-in users see a placeholder screen.
-- **Phase 2:** RSVP flow + voyage page skeleton + admin dashboard.
-- **Phases 3–4:** Content (diary, activities, fun facts, property gallery).
+- **Phase 1 (done):** Skeleton + auth. Signed-in users see a placeholder screen.
+- **Phase 2 (done):** RSVP flow + voyage page skeleton + admin dashboard. Custom domain Phase 2.G (follyintenerife.com) and custom email sender Phase 2.H (noreply@follyintenerife.com) complete.
+- **Phase 3 (next):** Content — fun facts seed (~50 entries), diary seeding (J.D.M. voice + Gnatalee McCringleberry, Keeper of the Sanity), admin compose UI.
+- **Phase 4:** Activities, property gallery.
+- **Phase 5:** T-minus-7 mode, post-trip memories mode, admin export.

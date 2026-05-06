@@ -6,6 +6,26 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-06] — nassims-folly: Phase 3 Planning [PLANNING]
+
+Phase 3 scope confirmed in Claude.ai session 2026-05-06. No code changes — planning only.
+
+### Scope
+- Fun facts seed (~50 entries) in `/content/fun_facts` — Claude.ai chat session
+- Diary seeding: J.D.M. voice (3 entries: pre-departure, mid-voyage, arrival) + Gnatalee McCringleberry, Keeper of the Sanity (3 entries) — Claude.ai chat session
+- Admin compose UI for new diary entries — Claude Code session
+- Property section wiring (activates when `/content/property/status` flips to `confirmed`) — Claude Code session
+- Voyage page visual pass — Claude Code session
+
+### Character name confirmed
+"Deadpan First Mate" working name resolved: **Gnatalee McCringleberry, Keeper of the Sanity**. Voice: bone-dry, undermines J.D.M. without directly contradicting him.
+
+### Session order
+1. Claude.ai: seed fun facts pool
+2. Claude.ai: seed diary samples (J.D.M. + Gnatalee)
+3. Claude Code: Phase 3 build (admin compose UI + property wiring + voyage visual pass)
+
+---
 ## [2026-05-06] — nassims-folly: Admin Dashboard Bug Fixes [COMPLETED]
 
 - RSVP Dashboard was showing stale data (only Aubry) due to Firebase RTDB SDK serving a cached snapshot for `/invitees` on first admin load. Fixed by switching to direct REST API fetch (`/invitees.json?auth=<idToken>`) which bypasses the SDK local sync tree entirely.

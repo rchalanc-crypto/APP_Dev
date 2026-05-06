@@ -1,3 +1,12 @@
+# Web Apps Lab
+
+| App | Description | Live URL |
+|---|---|---|
+| [ride-tracker](apps/ride-tracker/) | Real-time collaborative MTB/kite session tracker | https://rchalanc-crypto.github.io/APP_Dev/ |
+| [nassims-folly](apps/nassims-folly/) | Nassim's Folly with Roberto — private invite-only RSVP | https://follyintenerife.com/apps/nassims-folly/ |
+
+---
+
 [SETUP-GUIDE_kite_MTb.md](https://github.com/user-attachments/files/27277754/SETUP-GUIDE_kite_MTb.md)
 # Ride Tracker - Real-Time Setup Guide
 

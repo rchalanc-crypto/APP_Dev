@@ -208,7 +208,7 @@ These are tracked here so they don't get lost. None are needed before the first 
 | Activities draft (15–20 entries: kiteboarding, golf, hiking, kayaking, restaurants, culture) | 4 | Claude.ai chat (next session) | Robert + Glenn = kiteboarders. Categories: `wind`, `wheels` (golf), `feet` (hiking), `water`, `food`, `culture`. |
 | Fun facts seed pool (~50 entries: history, geography, things to do) | 3 | Claude.ai chat | Mix of "useful" and "absurd." Bias toward absurd. |
 | Diary samples — J.D.M. (3 entries to seed) | 3 | Claude.ai chat | One pre-departure, one mid-voyage, one "arrival." Anchor tone for future entries. |
-| Diary samples — Deadpan First Mate | 3 | Claude.ai chat | Working name TBD. Voice: bone-dry, undermines J.D.M. without ever directly contradicting him. Sample line direction: *"The Captain reports we have built fortifications. We have stacked three rocks. The rocks are not load-bearing."* |
+| Diary samples — Gnatalee McCringleberry, Keeper of the Sanity | 3 | Claude.ai chat | Voice: bone-dry, undermines J.D.M. without ever directly contradicting him. Sample line direction: *"The Captain reports we have built fortifications. We have stacked three rocks. The rocks are not load-bearing."* |
 | Property photo gallery wiring | 4 | Claude Code | Activates when `/content/property/status` flips to `confirmed`. |
 | T-minus-7-days "intensify" mode | 5 | Claude Code | Voyage page swaps countdown styling; new diary cadence. |
 | Post-trip "memories" mode | 5 | Claude Code | Optional. Decide closer to the date. |
