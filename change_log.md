@@ -6,6 +6,13 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-06] — nassims-folly: Admin Dashboard Bug Fixes [COMPLETED]
+
+- RSVP Dashboard was showing stale data (only Aubry) due to Firebase RTDB SDK serving a cached snapshot for `/invitees` on first admin load. Fixed by switching to direct REST API fetch (`/invitees.json?auth=<idToken>`) which bypasses the SDK local sync tree entirely.
+- Tab switching now reloads data on each click (was load-once on admin screen open).
+- Admin link now uses a direct click handler instead of relying on hashchange, fixing intermittent navigation failures.
+
+---
 ## [2026-05-05] — nassims-folly Phase 2.H: Custom Email Sender [COMPLETED]
 
 Phase 2.H — Custom email sender: configured Firebase Auth custom domain for follyintenerife.com. Auth emails now send from `noreply@follyintenerife.com` (was: `noreply@wal-nassims-folly.firebaseapp.com`). Required Blaze plan upgrade (already done) and DNS records at Cloudflare (TXT for SPF + Firebase verification, 2× CNAME for DKIM).
