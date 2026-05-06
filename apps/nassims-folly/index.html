@@ -1013,10 +1013,10 @@
       tableEl.style.display = 'none';
 
       try {
+        console.log('[RSVP] attempting read, uid:', currentUser?.uid);
         const snap = await get(ref(db, 'invitees'));
         console.log('[RSVP] snap.numChildren():', snap.numChildren());
         console.log('[RSVP] snap.val():', JSON.stringify(snap.val()));
-        console.log('[RSVP] currentUser.uid:', currentUser?.uid);
         loadEl.style.display = 'none';
         tableEl.style.display = '';
 
@@ -1024,6 +1024,7 @@
         if (snap.exists()) snap.forEach(c => rows.push({ uid: c.key, ...c.val() }));
         renderRSVPTable(rows);
       } catch (err) {
+        console.error('[RSVP] read failed, uid:', currentUser?.uid, 'error:', err.code, err.message);
         loadEl.className   = 'admin-error';
         loadEl.textContent = 'Could not load RSVP data — deploy the rules update (Step D) first.';
       }
