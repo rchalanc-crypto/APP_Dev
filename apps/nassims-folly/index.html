@@ -19,6 +19,9 @@
       --dark:       #1a1a2e;
       --muted:      #5a6a7a;
       --error:      #b91c1c;
+      --moss:        #5c7a5c;
+      --trail-green: #2e6b4f;
+      --dirt:        #8b6f4a;
     }
 
     body {
@@ -435,6 +438,62 @@
     }
     .remove-btn:hover { background: #fef2f2; }
 
+    /* ── Diary feed ────────────────────────────────────────────────── */
+    .diary-entry {
+      background: var(--cream);
+      border-left: 4px solid var(--trail-green);
+      border-radius: 8px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+    .diary-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .diary-author { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1px; color: var(--trail-green); }
+    .diary-date   { font-size: 0.85rem; color: var(--dirt); font-style: italic; }
+    .diary-title  { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--dark); margin-bottom: 16px; letter-spacing: 0.5px; }
+    .diary-body p { margin-bottom: 12px; color: var(--dark); }
+    .diary-image  { width: 100%; border-radius: 6px; margin-top: 16px; }
+
+    .keeper-addendum {
+      margin-top: 24px;
+      padding: 18px 22px;
+      background: #f0ede6;
+      border-left: 3px solid var(--moss);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.93rem;
+    }
+    .keeper-label  { font-family: 'Bebas Neue', sans-serif; font-size: 0.8rem; letter-spacing: 2px; color: var(--moss); margin-bottom: 10px; }
+    .keeper-body p { margin-bottom: 10px; color: #3a3a3a; }
+    .keeper-sig    { margin-top: 14px; font-style: italic; font-size: 0.85rem; color: var(--moss); }
+
+    /* ── Admin diary compose ───────────────────────────────────────── */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.88rem; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+    .form-group input[type="text"] {
+      width: 100%; padding: 10px 14px; border: 2px solid var(--light-gray); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; transition: border-color 0.2s; color: var(--dark);
+    }
+    .form-group input[type="text"]:focus { outline: none; border-color: var(--ocean); }
+    .form-group textarea {
+      width: 100%; padding: 10px 14px; border: 2px solid var(--light-gray); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; resize: vertical;
+      transition: border-color 0.2s; color: var(--dark);
+    }
+    .form-group textarea:focus { outline: none; border-color: var(--ocean); }
+    .delete-btn {
+      background: none; border: 1px solid #fecaca; color: var(--error);
+      padding: 3px 10px; border-radius: 6px; font-size: 0.78rem;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    }
+    .delete-btn:hover { background: #fef2f2; }
+
     @media (min-width: 600px) {
       .app-header .brand-title { font-size: 5rem; }
       .countdown-num  { font-size: 5.5rem; }
@@ -595,9 +654,7 @@
 
       <section class="voyage-section">
         <h3 class="section-title">The Captain's Diary</h3>
-        <div class="section-card">
-          <p class="section-placeholder">No entries yet. J.D.M. has not yet found a quill that doesn't leak.</p>
-        </div>
+        <div id="diaryFeed"></div>
       </section>
 
       <section class="voyage-section">
@@ -608,7 +665,7 @@
       </section>
 
       <div class="fun-fact-strip" id="funFactStrip" style="display:none">
-        <p class="fun-fact-text" id="funFactText"></p>
+        <p class="fun-fact-text" id="funFactText" style="font-style:italic;color:var(--moss);">Loading a fact about Tenerife…</p>
       </div>
 
       <footer class="voyage-footer">
@@ -642,6 +699,7 @@
       <div class="tab-bar">
         <button class="tab-btn active" id="tabRSVP"      data-panel="panelRSVP">RSVP Dashboard</button>
         <button class="tab-btn"        id="tabAllowlist" data-panel="panelAllowlist">Allowlist</button>
+        <button class="tab-btn"        id="tabDiary"     data-panel="panelDiary">Diary</button>
       </div>
 
       <!-- Tab 1: RSVP Dashboard -->
@@ -696,6 +754,63 @@
         </button>
       </div>
 
+      <!-- Tab 3: Diary Compose -->
+      <div class="tab-panel" id="panelDiary">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--deep-blue);margin-bottom:20px;">New Entry</h3>
+
+        <div class="diary-compose">
+          <input type="hidden" id="editEntryId">
+
+          <div class="form-group">
+            <label>In-World Date
+              <span style="font-weight:400;font-size:0.85rem;">(free text — "Day 14 at Sea", not a date picker)</span>
+            </label>
+            <input type="text" id="composeInWorldDate" placeholder="e.g. Day 41 — Arrival at Tenerife">
+          </div>
+
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="composeTitle" placeholder="Entry title">
+          </div>
+
+          <div class="form-group">
+            <label>J.D.M.'s Entry
+              <span style="font-weight:400;font-size:0.85rem;">(**bold**, *italic*, blank line = paragraph)</span>
+            </label>
+            <textarea id="composeBody" rows="10" placeholder="Dear Roberto, …"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Keeper's Notes
+              <span style="font-weight:400;font-size:0.85rem;">(optional — leave blank for no addendum. Signature added automatically.)</span>
+            </label>
+            <textarea id="composeKeeperNote" rows="6" placeholder="Re: the above. …"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Image URL <span style="font-weight:400;font-size:0.85rem;">(optional)</span></label>
+            <input type="text" id="composeImageUrl" placeholder="https://…">
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+            <button class="btn btn-primary admin-btn" onclick="publishEntry()">Publish</button>
+            <button class="btn admin-btn" onclick="previewEntry()" style="background:var(--cream);">Preview</button>
+            <button class="btn admin-btn" id="cancelEditBtn" onclick="cancelEdit()"
+                    style="display:none;background:var(--light-gray);">Cancel edit</button>
+          </div>
+        </div>
+
+        <div id="diaryPreviewPane" style="display:none;margin-top:24px;">
+          <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--moss);margin-bottom:12px;">PREVIEW</h4>
+          <div id="diaryPreviewContent" class="diary-entry"></div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <h4 style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--trail-green);margin-bottom:12px;">PUBLISHED ENTRIES</h4>
+          <div id="adminDiaryList"></div>
+        </div>
+      </div>
+
       <footer class="voyage-footer" style="margin-top:32px">
         <div class="voyage-footer-links">
           <button class="footer-link" id="adminBackBtn">← Back</button>
@@ -715,7 +830,7 @@
       getAuth, sendSignInLinkToEmail, isSignInWithEmailLink,
       signInWithEmailLink, onAuthStateChanged, signOut
     } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getDatabase, ref, get, set, update, remove, onValue }
+    import { getDatabase, ref, get, set, push, update, remove, onValue, query, orderByChild, limitToLast }
       from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     // ── Firebase config ───────────────────────────────────────────
@@ -743,11 +858,12 @@
     }
 
     // ── Session state ─────────────────────────────────────────────
-    let currentUser   = null;
-    let currentName   = '';
-    let currentStatus = 'pending';
-    let isAdmin       = false;
-    let adminChecked  = false;
+    let currentUser          = null;
+    let currentName          = '';
+    let currentStatus        = 'pending';
+    let isAdmin              = false;
+    let adminChecked         = false;
+    let diaryListenerActive  = false;
 
     // ── Countdown ─────────────────────────────────────────────────
     // 25 May 2027 00:00:00 in Atlantic/Canary (WEST = UTC+1 in summer).
@@ -855,10 +971,68 @@
         const newSeen = [...seen.filter(k => keys.includes(k)), pick].slice(-30);
         localStorage.setItem('nf_seen_facts', JSON.stringify(newSeen));
 
+        const factVal = facts[pick];
         document.getElementById('funFactText').textContent =
-          `A fact about Tenerife: ${facts[pick]}`;
+          typeof factVal === 'object' ? factVal.text : factVal;
         document.getElementById('funFactStrip').style.display = '';
       } catch (_) { /* non-fatal */ }
+    }
+
+    // ── Markdown ──────────────────────────────────────────────────
+    function renderMarkdown(text) {
+      if (!text) return '';
+      return '<p>' +
+        text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>') +
+        '</p>';
+    }
+
+    // ── Diary feed ────────────────────────────────────────────────
+    function initDiaryFeed() {
+      const diaryRef = query(
+        ref(db, 'content/diary'),
+        orderByChild('created_at'),
+        limitToLast(10)
+      );
+      onValue(diaryRef, (snapshot) => {
+        const entries = [];
+        snapshot.forEach(child => entries.unshift({ id: child.key, ...child.val() }));
+        renderDiary(entries);
+      });
+    }
+
+    function renderDiary(entries) {
+      const container = document.getElementById('diaryFeed');
+      if (entries.length === 0) {
+        container.innerHTML = `
+          <p style="text-align:center;color:var(--moss);font-style:italic;padding:40px 0;">
+            No entries yet. J.D.M. has not yet found a quill that doesn't leak.
+          </p>`;
+        return;
+      }
+      container.innerHTML = entries.map(entry => `
+        <div class="diary-entry">
+          <div class="diary-meta">
+            <span class="diary-author">${escapeHtml(entry.author)}</span>
+            <span class="diary-date">${escapeHtml(entry.in_world_date)}</span>
+          </div>
+          <h3 class="diary-title">${escapeHtml(entry.title)}</h3>
+          <div class="diary-body">${renderMarkdown(entry.body)}</div>
+          ${entry.image_url ? `<img class="diary-image" src="${escapeHtml(entry.image_url)}" alt="">` : ''}
+          ${entry.keeper_note ? `
+            <div class="keeper-addendum">
+              <div class="keeper-label">NOTES FOR ACCURACY</div>
+              <div class="keeper-body">${renderMarkdown(entry.keeper_note)}</div>
+              <div class="keeper-sig">G. McCringleberry, Keeper of the Sanity</div>
+            </div>` : ''}
+        </div>
+      `).join('');
     }
 
     function showVoyagePage() {
@@ -871,6 +1045,10 @@
         checkAdmin();
       }
       loadFunFact();
+      if (!diaryListenerActive) {
+        diaryListenerActive = true;
+        initDiaryFeed();
+      }
     }
 
     // ── Allowlist check + invitee provisioning + routing ──────────
@@ -1235,6 +1413,133 @@
       }
     });
 
+    // ── Admin diary compose ───────────────────────────────────────
+
+    async function publishEntry() {
+      const editId     = document.getElementById('editEntryId').value;
+      const keeperNote = document.getElementById('composeKeeperNote').value.trim();
+
+      const entry = {
+        author:        'J.D. Morgoone',
+        author_slug:   'jdm',
+        in_world_date: document.getElementById('composeInWorldDate').value.trim(),
+        title:         document.getElementById('composeTitle').value.trim(),
+        body:          document.getElementById('composeBody').value.trim(),
+        image_url:     document.getElementById('composeImageUrl').value.trim() || null,
+        created_at:    editId
+                         ? (await get(ref(db, `content/diary/${editId}/created_at`))).val()
+                         : new Date().toISOString()
+      };
+
+      if (keeperNote) entry.keeper_note = keeperNote;
+
+      if (!entry.in_world_date || !entry.title || !entry.body) {
+        alert('In-world date, title, and body are required.');
+        return;
+      }
+
+      try {
+        const targetRef = editId
+          ? ref(db, `content/diary/${editId}`)
+          : push(ref(db, 'content/diary'));
+        await set(targetRef, entry);
+        clearComposeForm();
+        loadAdminDiaryList();
+      } catch (err) {
+        console.error('Publish entry error:', err);
+        alert('Could not publish entry: ' + err.message);
+      }
+    }
+
+    function previewEntry() {
+      const keeperNote = document.getElementById('composeKeeperNote').value.trim();
+      document.getElementById('diaryPreviewPane').style.display = 'block';
+      document.getElementById('diaryPreviewContent').innerHTML = `
+        <div class="diary-meta">
+          <span class="diary-author">J.D. Morgoone</span>
+          <span class="diary-date">${escapeHtml(document.getElementById('composeInWorldDate').value)}</span>
+        </div>
+        <h3 class="diary-title">${escapeHtml(document.getElementById('composeTitle').value)}</h3>
+        <div class="diary-body">${renderMarkdown(document.getElementById('composeBody').value)}</div>
+        ${keeperNote ? `
+          <div class="keeper-addendum">
+            <div class="keeper-label">NOTES FOR ACCURACY</div>
+            <div class="keeper-body">${renderMarkdown(keeperNote)}</div>
+            <div class="keeper-sig">G. McCringleberry, Keeper of the Sanity</div>
+          </div>` : ''}
+      `;
+    }
+
+    function loadAdminDiaryList() {
+      const diaryRef = query(ref(db, 'content/diary'), orderByChild('created_at'));
+      onValue(diaryRef, (snapshot) => {
+        const entries = [];
+        snapshot.forEach(c => entries.unshift({ id: c.key, ...c.val() }));
+        const list = document.getElementById('adminDiaryList');
+        if (!list) return;
+        if (entries.length === 0) {
+          list.innerHTML = '<p style="color:var(--moss);">No entries yet.</p>';
+          return;
+        }
+        list.innerHTML = entries.map(e => `
+          <div style="background:var(--cream);border-radius:8px;padding:16px;margin-bottom:12px;
+                      display:flex;justify-content:space-between;align-items:start;gap:12px;">
+            <div>
+              <strong style="font-family:'Bebas Neue',sans-serif;">${escapeHtml(e.title)}</strong>
+              <span style="color:var(--moss);font-size:0.85rem;margin-left:10px;">${escapeHtml(e.in_world_date)}</span>
+              ${e.keeper_note ? '<span style="color:var(--dirt);font-size:0.8rem;margin-left:6px;">+ Keeper</span>' : ''}
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+              <button class="btn admin-btn" onclick="editEntry('${escapeHtml(e.id)}')"
+                      style="padding:6px 12px;font-size:0.85rem;background:var(--light-gray);">Edit</button>
+              <button class="delete-btn" onclick="deleteEntry('${escapeHtml(e.id)}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }, { onlyOnce: true });
+    }
+
+    function editEntry(id) {
+      get(ref(db, `content/diary/${id}`)).then(snap => {
+        const e = snap.val();
+        document.getElementById('editEntryId').value        = id;
+        document.getElementById('composeInWorldDate').value = e.in_world_date;
+        document.getElementById('composeTitle').value       = e.title;
+        document.getElementById('composeBody').value        = e.body;
+        document.getElementById('composeKeeperNote').value  = e.keeper_note || '';
+        document.getElementById('composeImageUrl').value    = e.image_url   || '';
+        document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        document.querySelector('.diary-compose').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    function cancelEdit() { clearComposeForm(); }
+
+    function clearComposeForm() {
+      ['editEntryId', 'composeInWorldDate', 'composeTitle',
+       'composeBody', 'composeKeeperNote', 'composeImageUrl']
+        .forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('cancelEditBtn').style.display = 'none';
+      document.getElementById('diaryPreviewPane').style.display = 'none';
+    }
+
+    async function deleteEntry(id) {
+      if (!confirm('Delete this diary entry? This cannot be undone.')) return;
+      try {
+        await remove(ref(db, `content/diary/${id}`));
+        loadAdminDiaryList();
+      } catch (err) {
+        console.error('Delete entry error:', err);
+        alert('Could not delete entry: ' + err.message);
+      }
+    }
+
+    window.publishEntry = publishEntry;
+    window.previewEntry = previewEntry;
+    window.cancelEdit   = cancelEdit;
+    window.editEntry    = editEntry;
+    window.deleteEntry  = deleteEntry;
+
     // ── Tab switching ─────────────────────────────────────────────
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1245,6 +1550,7 @@
         document.getElementById(btn.dataset.panel).classList.add('active');
         if (btn.dataset.panel === 'panelRSVP')       loadRSVPTab();
         if (btn.dataset.panel === 'panelAllowlist')  loadAllowlistTab();
+        if (btn.dataset.panel === 'panelDiary')      loadAdminDiaryList();
       });
     });
 
