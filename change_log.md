@@ -6,6 +6,61 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-07] — nassims-folly Phase 3: Diary, Fun Facts & Admin Compose [COMPLETED]
+
+### Summary
+
+**[FEATURE] Phase 3 complete — diary feed, fun facts rotation, admin compose UI, content seed.**
+
+**§A — Fun facts rotation (index.html)**
+- `loadFunFact()` updated to read `{ text, category }` objects (backward-compat with plain strings)
+- localStorage cycling via `nf_seen_facts` key; pool of last 30 seen IDs avoided per visit
+- Fun fact strip hidden until a fact loads; loading placeholder text shown in element
+
+**§B — Diary feed (voyage page)**
+- `initDiaryFeed()` — `onValue` listener on `/content/diary` ordered by `created_at`, `limitToLast(10)`, newest-first; guarded by `diaryListenerActive` to prevent duplicate listeners
+- `renderDiary()` — renders `.diary-entry` cards; `keeper_note` block only rendered when present
+- `renderMarkdown()` — minimal inline converter: `**bold**`, `*italic*`, `\n\n` → paragraphs, `\n` → `<br>`; HTML escaped before markdown applied; no library import
+- CSS: `.diary-entry`, `.diary-meta`, `.diary-author`, `.diary-date`, `.diary-title`, `.diary-body`, `.keeper-addendum`, `.keeper-label`, `.keeper-body`, `.keeper-sig`
+- CSS vars added: `--moss (#5c7a5c)`, `--trail-green (#2e6b4f)`, `--dirt (#8b6f4a)`
+
+**§C — Admin Diary compose tab**
+- Third tab "Diary" added to admin dashboard
+- Compose form: in-world date, title, J.D.M. body (markdown), optional Keeper note, optional image URL
+- Live preview panel renders markdown before publish
+- Published entries list: title + in-world date + "+ Keeper" indicator; Edit / Delete buttons
+- `publishEntry`, `previewEntry`, `editEntry`, `deleteEntry`, `clearComposeForm` — all `window.*` exposed for inline onclick handlers
+
+**§D — Content seed**
+- `seed-phase3.html` — standalone admin-only seed page; deployed alongside the app
+- Signs in via existing Firebase session (same domain); checks admin role before enabling button
+- Diary entries: `set()` at named paths (`dep-001`, `voy-014`, `arr-001`) — idempotent
+- Fun facts (50) + activities (25): `push()` with existence check to guard against duplicate seeding
+- Live at `https://follyintenerife.com/apps/nassims-folly/seed-phase3.html`
+
+### Deviations from SPEC-PHASE-3.md
+
+- **§A function name:** Spec names the function `initFunFact()`; kept existing `loadFunFact()` to avoid a dead-code rename. Behaviour is identical.
+- **§C HTML classes:** Spec uses `admin-tab`/`admin-panel`; used existing `tab-btn`/`tab-panel` for consistency with the RSVP and Allowlist tabs.
+- **§D delivery:** Spec implied seeding inline or via admin panel; delivered as a separate `seed-phase3.html` to keep `index.html` from growing by ~250 lines of static data.
+- **XSS hardening beyond spec:** `renderDiary` escapes `entry.author`, `entry.in_world_date`, `entry.title`, `entry.image_url` via `escapeHtml()`. Spec omitted this; added as standard practice.
+- **`deleteEntry` function:** Referenced in spec §C.3 rendered HTML but not defined in the spec. Implemented with a confirm dialog and `remove()` call.
+
+### §F acceptance status
+
+Code-level checks passed (no `console.log` in output). Browser acceptance checklist (§F items 1–9) to be confirmed manually after running the seed script.
+
+### What's next (Phase 4)
+
+- Activities render UI (data already seeded)
+- Kite/wind weather widget (Open-Meteo, 3 spots: El Médano, Cabezo, Playa de la Tejita)
+- Paragliding + Moustache/parakite conditions widgets
+- Activity ranker (weather-driven daily ranking across all categories)
+- Required Viewing video section (Akkersdijk, Block, Pastrana)
+- Property gallery (pending property confirmation)
+- 3 air activity entries to seed (Moustache Tenesar, Famara, Fuerteventura)
+
+---
 ## [2026-05-06] — nassims-folly Phase 3: Spec Approved [PENDING BUILD]
 
 [SPEC] Phase 3 spec drafted in Claude.ai chat. Content seed v2 finalised.
