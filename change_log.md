@@ -6,6 +6,22 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-06] — nassims-folly Phase 3: Spec Approved [PENDING BUILD]
+
+[SPEC] Phase 3 spec drafted in Claude.ai chat. Content seed v2 finalised.
+
+- SPEC-PHASE-3.md added to apps/nassims-folly/
+- Deadpan First Mate replaced by Gnatalee McCringleberry, Keeper of the Sanity
+- Data model update: keeper_note optional field on /content/diary/{id}
+- Seed content: 3 diary entries (dep-001, voy-014, arr-001), 50 fun facts,
+  25 activities (20 original + 5 motor category)
+- Character canon locked: J.D.M. plays golf and pickleball badly; Gnatalee
+  beats him at both first try; her real sports are kitesurfing, rally, MTB
+- Phase 4 planned: activities UI, kite weather (Open-Meteo, 3 spots),
+  Required Viewing video section (Ken Block + Travis Pastrana Gymkhana),
+  property gallery
+
+---
 ## [2026-05-06] — nassims-folly: Phase 3 Planning [PLANNING]
 
 Phase 3 scope confirmed in Claude.ai session 2026-05-06. No code changes — planning only.
