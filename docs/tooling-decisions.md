@@ -18,3 +18,5 @@ Format: date | app | decision | tool used | notes
 2026-05-05 | nassims-folly | Phase 2.H — custom email sender | Claude Code + browser | Firebase Auth custom domain configured for follyintenerife.com. Auth emails now from noreply@follyintenerife.com. SPF/DKIM DNS records at Cloudflare (TXT + 2× CNAME). Blaze plan required (already active). Note: passwordless sign-in email body and display name are locked by Firebase — not customizable via Console.
 
 2026-05-06 | nassims-folly | admin dashboard bug fix | Claude Code | RSVP dashboard was serving stale data (SDK cached /invitees snapshot). Switched to direct REST API fetch (/invitees.json?auth=<idToken>) to bypass SDK local sync tree. Tab switching now reloads data on each click.
+
+2026-05-06 | nassims-folly | Phase 3 planning: SPEC-PHASE-3.md, content seed v2, diary-entries-draft.md | Claude.ai chat | Gnatalee McCringleberry character finalised. keeper_note data model. 50 fun facts, 3 seed diary entries, 20+5 activities. Paragliding + Moustache activities + widgets planned for Phase 4. Activity ranker widget planned. Required Viewing section (Akkersdijk/Block/Pastrana) planned.
