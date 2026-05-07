@@ -8,7 +8,7 @@
 
 ## CHARACTER NOTE — READ BEFORE EDITING
 
-**J.D. Morgoone** signs off as "J.D. Morgoone, Chronicler to the Expedition"
+**J'Dinklage Morgoone** signs off as "J'Dinklage Morgoone, Chronicler to the Expedition"
 — always the full form, never abbreviated to "J.D.M." in the sign-off line.
 
 **Gnatalee McCringleberry** calls him "the Captain" throughout her notes.
@@ -20,7 +20,7 @@ she documents the title faithfully without comment. Do NOT correct
 
 ## Entry: The Hill
 **In-world date:** Day 52 — The Subida
-**Author:** J.D. Morgoone
+**Author:** J'Dinklage Morgoone
 **Keeper's note:** Yes
 
 ### J.D.M. body
@@ -43,7 +43,7 @@ I will say only that we returned the vehicle undamaged and that the man at the p
 
 The hill is magnificent. I recommend it without reservation.
 
-— J.D. Morgoone, Chronicler to the Expedition
+— J'Dinklage Morgoone, Chronicler to the Expedition
 
 ### Keeper's note
 
@@ -61,7 +61,7 @@ The Subaru is fine. I checked.
 
 ## Entry: The Course Respected Me
 **In-world date:** Day 4 — Golf del Sur
-**Author:** J.D. Morgoone
+**Author:** J'Dinklage Morgoone
 **Keeper's note:** Yes
 
 ### J.D.M. body
@@ -86,7 +86,7 @@ My score is not relevant to this account.
 
 I will return to the course. The course is not finished with me.
 
-— J.D. Morgoone, Chronicler to the Expedition
+— J'Dinklage Morgoone, Chronicler to the Expedition
 
 ### Keeper's note
 
@@ -104,7 +104,7 @@ Tomorrow I am going kitesurfing. El Médano is reporting 18 knots from the north
 
 ## Entry: A Sport Built for Me
 **In-world date:** Day 8 — The Property Court
-**Author:** J.D. Morgoone
+**Author:** J'Dinklage Morgoone
 **Keeper's note:** Yes
 
 ### J.D.M. body
@@ -127,7 +127,7 @@ She returned to her paperwork afterward. She did not appear to have exerted hers
 
 Pickleball is a magnificent sport. I intend to practise.
 
-— J.D. Morgoone, Chronicler to the Expedition
+— J'Dinklage Morgoone, Chronicler to the Expedition
 
 ### Keeper's note
 
@@ -185,7 +185,7 @@ every morning before anyone else is awake.
 I did not attempt the barrel roll. The Keeper had demonstrated the barrel
 roll. I made a note about the barrel roll for a future occasion.
 
-— J.D. Morgoone, Chronicler to the Expedition
+— J'Dinklage Morgoone, Chronicler to the Expedition
 
 ### Keeper's note
 

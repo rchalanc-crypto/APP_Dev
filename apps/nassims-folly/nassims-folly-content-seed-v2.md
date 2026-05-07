@@ -50,7 +50,7 @@
 ### Entry 1 — Pre-departure
 
 **Slug:** `dep-001`
-**Author:** J.D. Morgoone
+**Author:** J'Dinklage Morgoone
 **In-world date:** Year of Our Voyage, Day Negative-Three-Hundred-and-Sixty-One
 **Title:** *I Have Purchased a Ship*
 
@@ -89,7 +89,7 @@
 ### Entry 2 — Mid-voyage (the canonical sample)
 
 **Slug:** `voy-014`
-**Author:** J.D. Morgoone
+**Author:** J'Dinklage Morgoone
 **In-world date:** Day 14 at Sea
 **Title:** *Shipwrecked, Pleasantly*
 
@@ -110,7 +110,7 @@
 ### Entry 3 — Arrival
 
 **Slug:** `arr-001`
-**Author:** J.D. Morgoone
+**Author:** J'Dinklage Morgoone
 **In-world date:** Day 41 — Arrival at Tenerife
 **Title:** *We Have Arrived*
 

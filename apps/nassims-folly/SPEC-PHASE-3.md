@@ -23,7 +23,7 @@
 
 ## Characters
 
-### J.D. Morgoone
+### J'Dinklage Morgoone
 Chronicler to the Expedition. Author of all diary entries. Voice: florid,
 confident, wrong about roughly 30% of facts, never in doubt.
 `author_slug: "jdm"`
@@ -45,7 +45,7 @@ has not done.
 ```json
 {
   "slug":          "dep-001",
-  "author":        "J.D. Morgoone",
+  "author":        "J'Dinklage Morgoone",
   "author_slug":   "jdm",
   "in_world_date": "Year of Our Voyage, Day Negative-Three-Hundred-and-Sixty-One",
   "title":         "I Have Purchased a Ship",
@@ -309,7 +309,7 @@ Do NOT import a markdown library.
 
 ## §C — Admin Diary Compose UI
 
-New third tab in the admin dashboard. Author is always J.D. Morgoone — no
+New third tab in the admin dashboard. Author is always J'Dinklage Morgoone — no
 dropdown needed. The Keeper signature line is automatic; Robert only writes
 the `keeper_note` body text.
 
@@ -387,7 +387,7 @@ async function publishEntry() {
   const keeperNote = document.getElementById('composeKeeperNote').value.trim();
 
   const entry = {
-    author:        'J.D. Morgoone',
+    author:        'J'Dinklage Morgoone',
     author_slug:   'jdm',
     in_world_date: document.getElementById('composeInWorldDate').value.trim(),
     title:         document.getElementById('composeTitle').value.trim(),
@@ -419,7 +419,7 @@ function previewEntry() {
   document.getElementById('diaryPreviewPane').style.display = 'block';
   document.getElementById('diaryPreviewContent').innerHTML = `
     <div class="diary-meta">
-      <span class="diary-author">J.D. Morgoone</span>
+      <span class="diary-author">J'Dinklage Morgoone</span>
       <span class="diary-date">${document.getElementById('composeInWorldDate').value}</span>
     </div>
     <h3 class="diary-title">${document.getElementById('composeTitle').value}</h3>
@@ -508,7 +508,7 @@ missing from the existing SDK import list.
 ```json
 {
   "slug": "dep-001",
-  "author": "J.D. Morgoone",
+  "author": "J'Dinklage Morgoone",
   "author_slug": "jdm",
   "in_world_date": "Year of Our Voyage, Day Negative-Three-Hundred-and-Sixty-One",
   "title": "I Have Purchased a Ship",
@@ -524,7 +524,7 @@ missing from the existing SDK import list.
 ```json
 {
   "slug": "voy-014",
-  "author": "J.D. Morgoone",
+  "author": "J'Dinklage Morgoone",
   "author_slug": "jdm",
   "in_world_date": "Day 14 at Sea",
   "title": "Shipwrecked, Pleasantly",
@@ -540,7 +540,7 @@ missing from the existing SDK import list.
 ```json
 {
   "slug": "arr-001",
-  "author": "J.D. Morgoone",
+  "author": "J'Dinklage Morgoone",
   "author_slug": "jdm",
   "in_world_date": "Day 41 — Arrival at Tenerife",
   "title": "We Have Arrived",

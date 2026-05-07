@@ -13,12 +13,12 @@ Two-step gate after sign-in:
 
 ## Character canon
 
-**J.D. Morgoone** embraces golf and pickleball with great enthusiasm and
+**J'Dinklage Morgoone** embraces golf and pickleball with great enthusiasm and
 no aptitude. His accounts of both feature confident misuse of terminology,
 equipment difficulties presented as strategic choices, and scores he declines
 to specify. He considers himself a natural athlete and has no evidence for this.
 
-J.D.M.'s formal sign-off is always: "J.D. Morgoone, Chronicler to the
+J.D.M.'s formal sign-off is always: "J'Dinklage Morgoone, Chronicler to the
 Expedition" — never abbreviated to "J.D.M." in the sign-off line itself.
 
 **Gnatalee McCringleberry** has never played golf or pickleball. She is better

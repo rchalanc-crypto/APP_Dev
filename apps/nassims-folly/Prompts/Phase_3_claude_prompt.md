@@ -17,7 +17,7 @@ for "go" before proceeding.
      complete, Phase 3 in progress, Phase 4+5 planned)
    - Add a new "Character canon" section below the Phase map:
 
-     J.D. Morgoone embraces golf and pickleball with great enthusiasm and no 
+     J'Dinklage Morgoone embraces golf and pickleball with great enthusiasm and no 
      aptitude. His accounts feature confident misuse of terminology, equipment 
      difficulties presented as strategic choices, and scores he declines to 
      specify. He considers himself a natural athlete and has no evidence for this.
