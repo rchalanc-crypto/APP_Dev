@@ -21,7 +21,7 @@
 **What success looks like:**
 - Every invitee responds within ~2 weeks of receiving their email.
 - Confirmed guests open the page repeatedly between invite and trip — the rotating fun facts and diary entries are the hook.
-- The diary voice (JDinkalage Morgoone et al.) is the thing people quote back to you in person.
+- The diary voice (J'Dinklage Morgoone et al.) is the thing people quote back to you in person.
 
 **Explicitly out of scope for v1:**
 - Group chat / commenting between guests
@@ -43,7 +43,7 @@
 | **RSVP page** | Calm, warm, decisive. Minimal copy. One clear question. | Tap **Yes, I'm in** or **Sadly, no** |
 | **Voyage page** (post-yes) | Rich, playful, slightly ridiculous. Diary-driven. | Read, scroll, return tomorrow |
 
-**The personality call:** The diary voice is the soul of this app. Everything else is scaffolding. Treat JDinkalage Morgoone's entries as a hero feature, not a footnote. Suggested visual direction:
+**The personality call:** The diary voice is the soul of this app. Everything else is scaffolding. Treat J'Dinklage Morgoone's entries as a hero feature, not a footnote. Suggested visual direction:
 - Type pairing: a serif with character (e.g., **Cormorant Garamond** or **Spectral**) for diary body, paired with a punchy display face (**Bebas Neue** or **Abril Fatface**) for headlines.
 - Palette: warm parchment / sun-bleached map aesthetic. Cream, ink, weathered teal, faded coral. Think old expedition journal more than tropical vacation poster.
 - Microtouches: subtle paper texture, a wax-seal motif on the "Yes" confirmation, a ship-in-bottle SVG somewhere.
@@ -56,7 +56,7 @@
 
 **Sample diary entry (to anchor the tone):**
 
-> **Day 14 at Sea — JDinkalage Morgoone, Chronicler**
+> **Day 14 at Sea — J'Dinklage Morgoone, Chronicler**
 >
 > *Dear Roberto,*
 >
