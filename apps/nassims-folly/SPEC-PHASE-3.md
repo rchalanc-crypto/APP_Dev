@@ -387,7 +387,7 @@ async function publishEntry() {
   const keeperNote = document.getElementById('composeKeeperNote').value.trim();
 
   const entry = {
-    author:        'J'Dinklage Morgoone',
+    author:        "J'Dinklage Morgoone",
     author_slug:   'jdm',
     in_world_date: document.getElementById('composeInWorldDate').value.trim(),
     title:         document.getElementById('composeTitle').value.trim(),
