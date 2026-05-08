@@ -711,6 +711,255 @@
     body.voyage-reveal {
       animation: darkReveal 0.8s ease-out forwards;
     }
+
+    /* ── §A — Video grid ─────────────────────────────────────────── */
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .video-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .video-card {
+      background: var(--charcoal);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .video-embed {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+    }
+
+    .video-embed iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    .video-caption { padding: 14px 16px; }
+
+    .video-caption-jdm {
+      font-family: var(--font-diary);
+      font-style: italic;
+      font-size: 14px;
+      color: var(--parchment);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .video-caption-keeper {
+      font-size: 12px;
+      color: var(--smoke);
+      border-top: 0.5px solid var(--iron);
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .video-caption-keeper::before {
+      content: "— Keeper: ";
+      color: var(--neon);
+      font-weight: 500;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── §B — Activity filters and grid ─────────────────────────── */
+    .activity-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 4px;
+      border: 1px solid var(--iron);
+      background: transparent;
+      color: var(--smoke);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--charcoal);
+      color: var(--parchment);
+      border-color: var(--neon);
+    }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .activity-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 900px) {
+      .activity-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .activity-card {
+      background: var(--charcoal);
+      border-radius: 8px;
+      padding: 16px;
+      border-left: 3px solid var(--iron);
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .activity-card:hover { transform: translateY(-2px); }
+
+    .activity-card-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--parchment);
+      margin-bottom: 8px;
+    }
+
+    .activity-card-desc {
+      font-size: 13px;
+      color: var(--smoke);
+      line-height: 1.6;
+    }
+
+    .activity-card-verify {
+      font-size: 11px;
+      color: #C4A03E;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ── §C — Conditions tabs + weather cards ────────────────────── */
+    .conditions-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .cond-tab {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid var(--iron);
+      background: transparent;
+      color: var(--smoke);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cond-tab.active,
+    .cond-tab:hover {
+      background: var(--charcoal);
+      color: var(--neon);
+      border-color: var(--neon);
+    }
+
+    .wx-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) { .wx-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .wx-card {
+      background: var(--charcoal);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .wx-score-bar { height: 3px; border-radius: 2px; margin-bottom: 12px; }
+    .wx-score-bar.green { background: var(--neon); }
+    .wx-score-bar.amber { background: #C4A03E; }
+    .wx-score-bar.red   { background: #8B2020; }
+
+    .wx-spot-name {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--parchment);
+      margin-bottom: 4px;
+    }
+
+    .wx-verdict {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .wx-verdict.green { color: var(--neon); }
+    .wx-verdict.amber { color: #C4A03E; }
+    .wx-verdict.red   { color: #8B2020; }
+
+    .wx-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--smoke);
+    }
+
+    .wx-stat-wind { color: var(--parchment); font-weight: 500; }
+
+    .wx-forecast {
+      display: flex;
+      gap: 4px;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .wx-day { flex-shrink: 0; text-align: center; width: 36px; }
+
+    .wx-day-label {
+      font-size: 9px;
+      color: var(--iron);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .wx-day-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto; }
+    .wx-day-dot.green { background: var(--neon); }
+    .wx-day-dot.amber { background: #C4A03E; }
+    .wx-day-dot.red   { background: #555; }
+
+    .wx-day-val { font-size: 10px; color: var(--smoke); margin-top: 3px; }
+
+    .wx-note {
+      font-size: 11px;
+      color: var(--iron);
+      font-style: italic;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -907,7 +1156,10 @@
 
       <section id="watch" class="page-section">
         <div class="section-label">Required Viewing</div>
-        <p style="color: var(--iron); font-size: 14px;">Briefing materials loading...</p>
+        <p style="color:var(--smoke); font-size:13px; margin-bottom:24px; letter-spacing:1px; text-transform:uppercase;">
+          Pre-flight briefing materials. Watch before arrival.
+        </p>
+        <div class="video-grid" id="videoGrid"></div>
       </section>
 
       <section class="page-section" id="diary">
@@ -917,18 +1169,34 @@
 
       <section id="conditions" class="page-section">
         <div class="section-label">Conditions</div>
-        <p style="color: var(--iron); font-size: 14px;">Weather data loading in Phase 4.</p>
+
+        <div class="conditions-tabs">
+          <button class="cond-tab active" onclick="switchCondTab('kite', this)">🪁 Kite</button>
+          <button class="cond-tab" onclick="switchCondTab('para', this)">🪂 Paragliding</button>
+          <button class="cond-tab" onclick="switchCondTab('moust', this)">🦅 Moustache</button>
+        </div>
+
+        <div id="condKite"  class="cond-panel"></div>
+        <div id="condPara"  class="cond-panel" style="display:none;"></div>
+        <div id="condMoust" class="cond-panel" style="display:none;"></div>
       </section>
 
       <section id="ranker" class="page-section">
         <div class="section-label">Today's Call</div>
-        <p style="color: var(--iron); font-size: 14px;">Activity ranker loading in Phase 4.</p>
+        <div id="rankerOutput">
+          <p style="color:var(--iron);">Loading forecast…</p>
+        </div>
       </section>
 
       <section id="activities" class="page-section">
-        <div class="section-label">What to do</div>
-        <p style="color: var(--iron); font-size: 14px;">Activities loading in Phase 4.</p>
+        <div class="section-label">What to Do</div>
+        <div class="activity-filters" id="activityFilters"></div>
+        <div class="activity-grid" id="activityGrid">
+          <p style="color:var(--iron);">Loading activities…</p>
+        </div>
       </section>
+
+      <section id="property" class="page-section"></section>
 
       <div class="fun-fact-strip" id="funFactStrip" style="display:none">
         <p class="fun-fact-text" id="funFactText" style="font-style:italic;">Loading a fact about Tenerife…</p>
@@ -1187,6 +1455,9 @@
     let diaryListenerActive  = false;
     let briefsListenerActive = false;
     let scrollSpyActive      = false;
+    let weatherWidgetActive  = false;
+    let activitiesActive     = false;
+    let propertyListenActive = false;
 
     // ── Countdown ─────────────────────────────────────────────────
     // 25 May 2027 00:00:00 in Atlantic/Canary (WEST = UTC+1 in summer).
@@ -1459,6 +1730,22 @@
       if (!briefsListenerActive) {
         briefsListenerActive = true;
         initBriefsFeed();
+      }
+      renderRequiredViewing();
+      if (!activitiesActive) {
+        activitiesActive = true;
+        initActivities();
+      }
+      if (!weatherWidgetActive) {
+        weatherWidgetActive = true;
+        initKiteWidget();
+        initParaWidget();
+        initMoustWidget();
+        initActivityRanker();
+      }
+      if (!propertyListenActive) {
+        propertyListenActive = true;
+        initPropertySection();
       }
     }
 
@@ -2175,6 +2462,484 @@
         }
       }
     });
+
+    // ── §A — Required Viewing ─────────────────────────────────────
+
+    const VIDEOS = [
+      {
+        id:     '5ybJz0oByhA',
+        jdm:    "The Chronicler has reviewed the literature on kite mastery. This is the literature.",
+        keeper: "Wind: 35+ knots. The Chronicler has been advised not to attempt this."
+      },
+      {
+        id:     'm_KBvP0_8Tc',
+        jdm:    "The Chronicler has reviewed the literature on hill driving. This is also the literature.",
+        keeper: "The verge incident has been omitted from the Chronicler's account. I have not omitted it."
+      },
+      {
+        id:     'LXzPkkQirnM',
+        jdm:    "A second opinion was sought on driving. The Keeper watched this one twice.",
+        keeper: "Technique."
+      }
+    ];
+
+    function renderRequiredViewing() {
+      document.getElementById('videoGrid').innerHTML = VIDEOS.map(v => `
+        <div class="video-card">
+          <div class="video-embed">
+            <iframe
+              src="https://www.youtube.com/embed/${v.id}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+              title="Required viewing">
+            </iframe>
+          </div>
+          <div class="video-caption">
+            <div class="video-caption-jdm">"${v.jdm}"</div>
+            <div class="video-caption-keeper">${v.keeper}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── §B — Activities ───────────────────────────────────────────
+
+    const CATEGORIES = {
+      all:     { label: 'All',     color: 'var(--smoke)' },
+      wind:    { label: 'Wind',    color: 'var(--neon)' },
+      air:     { label: 'Air',     color: 'var(--neon)' },
+      water:   { label: 'Water',   color: 'var(--ocean)' },
+      wheels:  { label: 'Wheels',  color: '#888' },
+      feet:    { label: 'Feet',    color: 'var(--terracotta)' },
+      motor:   { label: 'Motor',   color: 'var(--terracotta)' },
+      food:    { label: 'Food',    color: '#888' },
+      culture: { label: 'Culture', color: '#888' }
+    };
+
+    let allActivities = [];
+    let activeFilter  = 'all';
+
+    function initActivities() {
+      const activitiesRef = ref(db, 'content/activities');
+      onValue(activitiesRef, (snapshot) => {
+        allActivities = [];
+        snapshot.forEach(child => allActivities.push({ id: child.key, ...child.val() }));
+        allActivities.sort((a, b) => (a.order || 0) - (b.order || 0));
+        renderActivityFilters();
+        renderActivities();
+      }, { onlyOnce: true });
+    }
+
+    function renderActivityFilters() {
+      const filters = document.getElementById('activityFilters');
+      const cats = ['all', ...new Set(allActivities.map(a => a.category))];
+      filters.innerHTML = cats.map(cat => {
+        const cfg = CATEGORIES[cat] || { label: cat, color: 'var(--smoke)' };
+        return `<button class="filter-btn ${cat === activeFilter ? 'active' : ''}"
+          onclick="setFilter('${cat}')">${cfg.label}</button>`;
+      }).join('');
+    }
+
+    window.setFilter = function(cat) {
+      activeFilter = cat;
+      renderActivityFilters();
+      renderActivities();
+    };
+
+    function renderActivities() {
+      const grid     = document.getElementById('activityGrid');
+      const filtered = activeFilter === 'all'
+        ? allActivities
+        : allActivities.filter(a => a.category === activeFilter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<p style="color:var(--iron);">No activities in this category.</p>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(a => {
+        const cfg         = CATEGORIES[a.category] || { color: 'var(--iron)' };
+        const desc        = a.description || '';
+        const verifyMatch = desc.match(/— verify[^.]+\./i);
+        const cleanDesc   = verifyMatch ? desc.replace(verifyMatch[0], '').trim() : desc;
+        const verifyNote  = verifyMatch ? verifyMatch[0] : '';
+
+        return `
+          <div class="activity-card" style="border-left-color: ${cfg.color}">
+            <div class="activity-card-title">${escapeHtml(a.title)}</div>
+            <div class="activity-card-desc">${escapeHtml(cleanDesc)}</div>
+            ${verifyNote ? `<div class="activity-card-verify">⚠ ${escapeHtml(verifyNote)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── §C — Shared weather fetch layer ──────────────────────────
+
+    const WX_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
+
+    async function fetchWeather(lat, lon) {
+      const cacheKey = `wx_${lat}_${lon}`;
+      const cached   = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && Date.now() - cached.ts < WX_CACHE_TTL) return cached.data;
+
+      const [wxRes, marineRes] = await Promise.all([
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=wind_speed_10m,wind_direction_10m,weather_code,temperature_2m` +
+          `&daily=weather_code,wind_speed_10m_max,precipitation_sum` +
+          `&wind_speed_unit=knots&timezone=auto&forecast_days=7`),
+        fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}` +
+          `&current=wave_height&daily=wave_height_max&timezone=auto&forecast_days=5`)
+      ]);
+
+      const wx     = await wxRes.json();
+      const marine = await marineRes.json();
+      const data   = { wx, marine };
+
+      localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+      return data;
+    }
+
+    function windBearing(deg) {
+      const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+      return dirs[Math.round(deg / 45) % 8];
+    }
+
+    function kiteScore(windKnots, precipMm) {
+      if (precipMm > 0.5) return 'red';
+      if (windKnots >= 15 && windKnots <= 33) return 'green';
+      if (windKnots >= 10 && windKnots <= 40) return 'amber';
+      return 'red';
+    }
+
+    const SCORE_LABELS = {
+      kite:  { green: 'SEND IT', amber: 'MARGINAL', red: 'GROUND DAY' },
+      para:  { green: 'FLY',     amber: 'MARGINAL', red: 'NO-FLY'     },
+      moust: { green: 'SEND IT', amber: 'MARGINAL', red: 'GROUND DAY' }
+    };
+
+    // ── §C — Kite widget ─────────────────────────────────────────
+
+    const KITE_SPOTS = [
+      { name: 'El Médano',          lat: 28.0436, lon: -16.5388 },
+      { name: 'Cabezo',             lat: 28.0481, lon: -16.5256 },
+      { name: 'Playa de la Tejita', lat: 28.0349, lon: -16.5497 }
+    ];
+
+    async function initKiteWidget() {
+      const panel = document.getElementById('condKite');
+      panel.innerHTML = '<div class="wx-grid">' +
+        KITE_SPOTS.map((s, i) => `<div class="wx-card" id="kite_card_${i}">
+          <div class="wx-spot-name">${s.name}</div>
+          <div style="color:var(--iron);font-size:12px;">Loading…</div>
+        </div>`).join('') + '</div>';
+
+      for (let i = 0; i < KITE_SPOTS.length; i++) {
+        const spot = KITE_SPOTS[i];
+        try {
+          const { wx, marine } = await fetchWeather(spot.lat, spot.lon);
+          const wind   = Math.round(wx.current.wind_speed_10m);
+          const dir    = windBearing(wx.current.wind_direction_10m);
+          const wave   = marine.current?.wave_height?.toFixed(1) ?? '—';
+          const precip = wx.daily.precipitation_sum[0] ?? 0;
+          const score  = kiteScore(wind, precip);
+          const days   = wx.daily.time.slice(0, 7);
+          const dayDots = days.map((d, j) => {
+            const s     = kiteScore(wx.daily.wind_speed_10m_max[j], wx.daily.precipitation_sum[j] ?? 0);
+            const label = new Date(d).toLocaleDateString('en', { weekday: 'short' }).slice(0, 2);
+            return `<div class="wx-day">
+              <div class="wx-day-label">${label}</div>
+              <div class="wx-day-dot ${s}"></div>
+              <div class="wx-day-val">${Math.round(wx.daily.wind_speed_10m_max[j])}kt</div>
+            </div>`;
+          }).join('');
+
+          document.getElementById(`kite_card_${i}`).innerHTML = `
+            <div class="wx-score-bar ${score}"></div>
+            <div class="wx-spot-name">${spot.name}</div>
+            <div class="wx-verdict ${score}">${SCORE_LABELS.kite[score]}</div>
+            <div class="wx-stats">
+              <div class="wx-stat-wind">${wind} kt ${dir}</div>
+              <div>Wave: ${wave}m</div>
+            </div>
+            <div class="wx-forecast">${dayDots}</div>
+          `;
+        } catch(e) {
+          console.error('Kite wx failed for', spot.name, e);
+        }
+      }
+    }
+
+    window.switchCondTab = function(type, btn) {
+      document.querySelectorAll('.cond-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.cond-panel').forEach(p => { p.style.display = 'none'; });
+      btn.classList.add('active');
+      document.getElementById('cond' + type.charAt(0).toUpperCase() + type.slice(1)).style.display = 'block';
+    };
+
+    // ── §D — Paragliding widget ───────────────────────────────────
+
+    const PARA_SPOTS = [
+      { name: 'Tenerife South',    lat: 28.044,  lon: -16.539,
+        note: 'Tandem available. Thermal conditions.' },
+      { name: 'Teide Area',        lat: 28.2723, lon: -16.6421,
+        note: 'XC thermal flying. Cable car access.' },
+      { name: 'Famara (Day Trip)', lat: 29.117,  lon: -13.533,
+        note: 'Lanzarote. Binter ~55min from TFS. Verify conditions before booking flight.' }
+    ];
+
+    function paraScore(windKnots, weatherCode, precipMm) {
+      const windKmh = windKnots * 1.852;
+      if (precipMm > 0.1)          return 'red';
+      if (weatherCode >= 51)       return 'red';
+      if (windKmh <= 20 && weatherCode <= 2)  return 'green';
+      if (windKmh <= 28 && weatherCode <= 45) return 'amber';
+      return 'red';
+    }
+
+    async function initParaWidget() {
+      const panel = document.getElementById('condPara');
+      panel.innerHTML = '<div class="wx-grid">' +
+        PARA_SPOTS.map((s, i) => `<div class="wx-card" id="para_card_${i}">
+          <div class="wx-spot-name">${s.name}</div>
+          <div style="color:var(--iron);font-size:12px;">Loading…</div>
+        </div>`).join('') + '</div>';
+
+      for (let i = 0; i < PARA_SPOTS.length; i++) {
+        const spot = PARA_SPOTS[i];
+        try {
+          const { wx } = await fetchWeather(spot.lat, spot.lon);
+          const wind   = Math.round(wx.current.wind_speed_10m);
+          const dir    = windBearing(wx.current.wind_direction_10m);
+          const code   = wx.current.weather_code;
+          const precip = wx.daily.precipitation_sum[0] ?? 0;
+          const score  = paraScore(wind, code, precip);
+          const days   = wx.daily.time.slice(0, 7);
+          const dayDots = days.map((d, j) => {
+            const s     = paraScore(wx.daily.wind_speed_10m_max[j], wx.daily.weather_code[j], wx.daily.precipitation_sum[j] ?? 0);
+            const label = new Date(d).toLocaleDateString('en', { weekday: 'short' }).slice(0, 2);
+            return `<div class="wx-day">
+              <div class="wx-day-label">${label}</div>
+              <div class="wx-day-dot ${s}"></div>
+              <div class="wx-day-val">${Math.round(wx.daily.wind_speed_10m_max[j])}kt</div>
+            </div>`;
+          }).join('');
+
+          document.getElementById(`para_card_${i}`).innerHTML = `
+            <div class="wx-score-bar ${score}"></div>
+            <div class="wx-spot-name">${spot.name}</div>
+            <div class="wx-verdict ${score}">${SCORE_LABELS.para[score]}</div>
+            <div class="wx-stats">
+              <div class="wx-stat-wind">${wind} kt ${dir}</div>
+            </div>
+            <div class="wx-forecast">${dayDots}</div>
+            <div class="wx-note">${escapeHtml(spot.note)}</div>
+          `;
+        } catch(e) {
+          console.error('Para wx failed for', spot.name, e);
+        }
+      }
+    }
+
+    // ── §E — Moustache widget ─────────────────────────────────────
+
+    const MOUST_SPOTS = [
+      { name: 'Tenesar / Playa Teneza', lat: 29.017, lon: -13.550,
+        note: 'Lanzarote. Lava cliff soaring. Binter ~55min from TFS/TFN.' },
+      { name: 'Famara Ridge',           lat: 29.117, lon: -13.533,
+        note: 'Lanzarote. 600ft cliffs. NNW–NW required. Same Binter flight.' },
+      { name: 'Fuerteventura',          lat: 28.730, lon: -13.867,
+        note: 'Corralejo dunes. Most forgiving Moustache terrain. Binter ~45min.' }
+    ];
+
+    function moustScore(windKnots, precipMm) {
+      if (precipMm > 0.5)                            return 'red';
+      if (windKnots >= 15 && windKnots <= 28) return 'green';
+      if (windKnots >= 12 && windKnots <= 33) return 'amber';
+      return 'red';
+    }
+
+    async function initMoustWidget() {
+      const panel = document.getElementById('condMoust');
+      panel.innerHTML = '<div class="wx-grid">' +
+        MOUST_SPOTS.map((s, i) => `<div class="wx-card" id="moust_card_${i}">
+          <div class="wx-spot-name">${s.name}</div>
+          <div style="color:var(--iron);font-size:12px;">Loading…</div>
+        </div>`).join('') + '</div>';
+
+      for (let i = 0; i < MOUST_SPOTS.length; i++) {
+        const spot = MOUST_SPOTS[i];
+        try {
+          const { wx } = await fetchWeather(spot.lat, spot.lon);
+          const wind   = Math.round(wx.current.wind_speed_10m);
+          const dir    = windBearing(wx.current.wind_direction_10m);
+          const precip = wx.daily.precipitation_sum[0] ?? 0;
+          const score  = moustScore(wind, precip);
+          const days   = wx.daily.time.slice(0, 7);
+          const dayDots = days.map((d, j) => {
+            const s     = moustScore(wx.daily.wind_speed_10m_max[j], wx.daily.precipitation_sum[j] ?? 0);
+            const label = new Date(d).toLocaleDateString('en', { weekday: 'short' }).slice(0, 2);
+            return `<div class="wx-day">
+              <div class="wx-day-label">${label}</div>
+              <div class="wx-day-dot ${s}"></div>
+              <div class="wx-day-val">${Math.round(wx.daily.wind_speed_10m_max[j])}kt</div>
+            </div>`;
+          }).join('');
+
+          document.getElementById(`moust_card_${i}`).innerHTML = `
+            <div class="wx-score-bar ${score}"></div>
+            <div class="wx-spot-name">${spot.name}</div>
+            <div class="wx-verdict ${score}">${SCORE_LABELS.moust[score]}</div>
+            <div class="wx-stats">
+              <div class="wx-stat-wind">${wind} kt ${dir}</div>
+            </div>
+            <div class="wx-forecast">${dayDots}</div>
+            <div class="wx-note">${escapeHtml(spot.note)}</div>
+          `;
+        } catch(e) {
+          console.error('Moust wx failed for', spot.name, e);
+        }
+      }
+    }
+
+    // ── §F — Activity ranker ──────────────────────────────────────
+
+    function scoreCategory(cat, windKnots, weatherCode, precipMm, waveM) {
+      switch(cat) {
+        case 'wind':    return kiteScore(windKnots, precipMm);
+        case 'air':     return paraScore(windKnots, weatherCode, precipMm);
+        case 'water':
+          if (precipMm > 2) return 'red';
+          if (waveM > 2 || windKnots > 25) return 'amber';
+          return 'green';
+        case 'wheels':
+          return precipMm > 2 ? 'amber' : 'green';
+        case 'feet':
+          if (precipMm > 2 || weatherCode >= 51) return 'amber';
+          return 'green';
+        case 'motor':   return 'green';
+        case 'food':
+        case 'culture':
+          return (precipMm > 2 || weatherCode >= 51) ? 'green' : 'amber';
+        default:        return 'amber';
+      }
+    }
+
+    async function initActivityRanker() {
+      try {
+        const { wx, marine } = await fetchWeather(28.0436, -16.5388);
+        const windKnots   = wx.daily.wind_speed_10m_max[0];
+        const weatherCode = wx.daily.weather_code[0];
+        const precipMm    = wx.daily.precipitation_sum[0] ?? 0;
+        const waveM       = marine.daily?.wave_height_max?.[0] ?? 0;
+
+        const cats = ['wind','air','water','wheels','feet','motor','food','culture'];
+        const scored = cats.map(cat => ({
+          cat,
+          score: scoreCategory(cat, windKnots, weatherCode, precipMm, waveM),
+          cfg: CATEGORIES[cat]
+        }));
+
+        const order = { green: 0, amber: 1, red: 2 };
+        scored.sort((a, b) => order[a.score] - order[b.score]);
+
+        const top = scored[0];
+        const jdmCopy = {
+          wind:    "Conditions are optimal. The Chronicler has located his harness. It was under the golf clubs.",
+          air:     "The air is behaving. The Keeper has already gone. The Chronicler is considering it.",
+          water:   "The sea is reasonable. The Chronicler has been told kayaking is not difficult. He has his doubts.",
+          wheels:  "A golf day. The Chronicler approves. The course will receive him.",
+          feet:    "Hiking conditions are acceptable. The Chronicler has packed provisions. Mostly provisions.",
+          motor:   "The rally circuit awaits. The Chronicler has secured a vehicle. The Keeper has not been told.",
+          food:    "Weather for restaurants. The Chronicler considers this a win.",
+          culture: "An indoor day. The Chronicler will visit something historical and explain it incorrectly."
+        };
+
+        document.getElementById('rankerOutput').innerHTML = `
+          <div style="margin-bottom:20px;">
+            <div style="font-family:var(--font-display); font-size:28px; font-weight:700;
+                        color:${top.cfg.color}; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px;">
+              ${top.cfg.label}
+            </div>
+            <div style="font-family:var(--font-diary); font-style:italic; font-size:15px;
+                        color:var(--smoke); line-height:1.7; max-width:600px;">
+              "${jdmCopy[top.cat]}"
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            ${scored.map(s => `
+              <div style="background:var(--charcoal); border-radius:6px; padding:8px 14px;
+                          border-left:3px solid ${s.score === 'green' ? s.cfg.color : s.score === 'amber' ? '#C4A03E' : '#333'}">
+                <div style="font-family:var(--font-display); font-size:11px; font-weight:700;
+                            letter-spacing:2px; text-transform:uppercase;
+                            color:${s.score === 'green' ? s.cfg.color : s.score === 'amber' ? '#C4A03E' : 'var(--iron)'}">
+                  ${s.cfg.label}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="font-size:11px; color:var(--iron); margin-top:12px; font-style:italic;">
+            Based on forecast for Tenerife South · Updates every 2 hours
+          </div>
+        `;
+      } catch(e) {
+        document.getElementById('rankerOutput').innerHTML =
+          '<p style="color:var(--iron);">Forecast unavailable. Check conditions directly.</p>';
+        console.error('Ranker failed:', e);
+      }
+    }
+
+    // ── §G — Property section ─────────────────────────────────────
+
+    function initPropertySection() {
+      const propRef = ref(db, 'content/property');
+      onValue(propRef, (snapshot) => {
+        const prop    = snapshot.val();
+        const section = document.getElementById('property');
+        if (!section) return;
+
+        if (!prop || prop.status !== 'confirmed') {
+          section.innerHTML = `
+            <div class="section-label">The Property</div>
+            <div class="card" style="text-align:center; padding:40px 20px;">
+              <div style="font-family:var(--font-display); font-size:18px; color:var(--smoke);
+                          text-transform:uppercase; letter-spacing:2px; margin-bottom:8px;">
+                Scouting in Progress
+              </div>
+              <div style="font-family:var(--font-diary); font-style:italic; color:var(--iron); font-size:15px;">
+                Our chronicler is still scouting. Watch this space.
+              </div>
+            </div>`;
+          return;
+        }
+
+        const photos = prop.photos ? Object.values(prop.photos) : [];
+        section.innerHTML = `
+          <div class="section-label">The Property</div>
+          <div style="margin-bottom:16px;">
+            <div style="font-family:var(--font-display); font-size:24px; font-weight:700;
+                        text-transform:uppercase; letter-spacing:2px; color:var(--parchment);">
+              ${escapeHtml(prop.name || '')}
+            </div>
+            <div style="color:var(--smoke); font-size:14px; margin-top:4px;">
+              ${escapeHtml(prop.location || '')}
+            </div>
+            <div style="color:var(--smoke); font-size:14px; line-height:1.7; margin-top:12px; max-width:640px;">
+              ${escapeHtml(prop.description || '')}
+            </div>
+          </div>
+          ${photos.length ? `
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:8px; margin-top:16px;">
+              ${photos.map(p => `
+                <img src="${escapeHtml(p.url)}" alt="${escapeHtml(p.caption || '')}"
+                     style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:6px;"
+                     loading="lazy">
+              `).join('')}
+            </div>` : ''}
+        `;
+      });
+    }
 
     // ── Event listeners ───────────────────────────────────────────
 

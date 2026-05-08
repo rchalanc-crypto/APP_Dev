@@ -6,6 +6,45 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-08] — nassims-folly Phase 4: Activities, Weather Widgets & Required Viewing [COMPLETED]
+
+### Summary
+
+**[FEATURE] Phase 4 complete — Required Viewing (§A), Activities grid + filters (§B), Kite/Para/Moustache weather widgets (§C–§E), Activity Ranker (§F), Property placeholder + 3 air activities (§G).**
+
+**§A — Required Viewing**
+- `<section id="watch">` replaced with `.video-grid` (3-column responsive grid)
+- 3 videos: Akkersdijk King of the Air (`5ybJz0oByhA`), Ken Block Gymkhana Ten, Travis Pastrana Gymkhana 2022
+- Each card: YouTube embed (16:9 iframe, lazy), J.D.M. caption (`.video-caption-jdm`), Keeper addendum (`.video-caption-keeper`)
+
+**§B — Activities UI**
+- `<section id="activities">` replaced with filter row + `.activity-grid`
+- `CATEGORIES` config with 9 category labels + color tokens; `setFilter()` exposed on `window`
+- `initActivities()` reads `/content/activities/` once (`onlyOnce:true`), sorts by `order`
+- Activity cards: color-coded border-left per category; `— verify…` regex extracts `.activity-card-verify` note
+
+**§C–§E — Weather widgets (Open-Meteo)**
+- Shared `fetchWeather(lat, lon)` with localStorage 2-hour TTL cache (`wx_${lat}_${lon}`)
+- Conditions section: 3-tab switcher (Kite / Paragliding / Moustache); `switchCondTab()` on `window`
+- Kite widget: 3 spots (El Médano, Cabezo, Playa de la Tejita); `kiteScore()` 15–33kt green window
+- Para widget: 3 spots (Tenerife South, Teide, Famara day-trip); `paraScore()` uses km/h conversion; per-card Binter note
+- Moust widget: 3 spots (Tenesar, Famara Ridge, Fuerteventura); `moustScore()` 15–28kt green; per-card Binter note
+- Each wx card: colour-bar, spot name, verdict label, wind + wave stats, 7-day dot forecast
+
+**§F — Activity Ranker**
+- `scoreCategory()` maps all 9 categories against live forecast data
+- Re-uses El Médano cached data from kite widget (no extra API calls on warm cache)
+- Top category rendered large with J.D.M. copy; full ranked list below in coloured chips
+
+**§G — Property + Seed**
+- `<section id="property">` added after activities; `initPropertySection()` listens on `/content/property`
+- Placeholder shown when `status !== "confirmed"`; gallery renders when confirmed
+- `seed-phase4.js` created for 3 air activities (Tenesar, Famara Ridge, Fuerteventura) at orders 28–30
+
+**Session guards:** `weatherWidgetActive`, `activitiesActive`, `propertyListenActive` prevent duplicate listeners.
+
+---
+
 ## [2026-05-07] — nassims-folly Phase 3.5: UI Redesign + Expedition Briefs [COMPLETED]
 
 ### Summary
