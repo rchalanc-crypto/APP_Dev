@@ -28,6 +28,9 @@ of which she pursues with quiet competence and no drama whatsoever. She finds
 the Captain's enthusiasm for gentler sports baffling but professionally
 manageable.
 
+Gnatalee's formal sign-off is always: "Gnatalee McCringleberry, Keeper of the
+Sanity" — never abbreviated to "G. McCringleberry" or any other short form.
+
 IMPORTANT FOR FUTURE SESSIONS: Gnatalee calls J.D.M. "the Captain"
 throughout her diary notes. This is intentional dry irony — he is not a
 captain, he calls himself one, and she documents it faithfully. Do NOT

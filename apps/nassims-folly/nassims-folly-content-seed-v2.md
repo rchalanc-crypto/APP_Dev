@@ -24,7 +24,7 @@
 - Has done research the Captain has not done
 - Lets a flicker of weariness through at the end of an entry, never the start
 - Will eventually develop sympathy for J.D.M. — but not for several months
-- Signs her addenda **G. McCringleberry, Keeper of the Sanity**
+- Signs her addenda **Gnatalee McCringleberry, Keeper of the Sanity**
 
 **Format pattern:** every J.D.M. diary entry can carry an optional Gnatalee appendix. Stored as one `/content/diary/{id}` document with `keeper_note` as an optional field. Renders as a single diary card; visually the Keeper's section is differentiated (Designer call — different type, slight indent, off-white instead of cream).
 
@@ -41,7 +41,7 @@
 > The crew's morale is, as the Captain notes, high. This is in part because the crew does not know about the vinegar.
 >
 > Respectfully,
-> G. McCringleberry, Keeper of the Sanity
+> Gnatalee McCringleberry, Keeper of the Sanity
 
 ---
 
@@ -82,7 +82,7 @@
 > *Patience* is a serviceable name. I would have preferred *Prudence.*
 >
 > Respectfully,
-> G. McCringleberry, Keeper of the Sanity
+> Gnatalee McCringleberry, Keeper of the Sanity
 
 ---
 
@@ -142,7 +142,7 @@
 > Glenn does indeed know about kiteboarding. The Captain has been told this multiple times.
 >
 > Respectfully,
-> G. McCringleberry, Keeper of the Sanity
+> Gnatalee McCringleberry, Keeper of the Sanity
 
 ---
 

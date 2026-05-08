@@ -212,7 +212,7 @@ function renderDiary(entries) {
         <div class="keeper-addendum">
           <div class="keeper-label">NOTES FOR ACCURACY</div>
           <div class="keeper-body">${renderMarkdown(entry.keeper_note)}</div>
-          <div class="keeper-sig">G. McCringleberry, Keeper of the Sanity</div>
+          <div class="keeper-sig">Gnatalee McCringleberry, Keeper of the Sanity</div>
         </div>` : ''}
     </div>
   `).join('');
@@ -428,7 +428,7 @@ function previewEntry() {
       <div class="keeper-addendum">
         <div class="keeper-label">NOTES FOR ACCURACY</div>
         <div class="keeper-body">${renderMarkdown(keeperNote)}</div>
-        <div class="keeper-sig">G. McCringleberry, Keeper of the Sanity</div>
+        <div class="keeper-sig">Gnatalee McCringleberry, Keeper of the Sanity</div>
       </div>` : ''}
   `;
 }
