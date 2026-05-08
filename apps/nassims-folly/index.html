@@ -293,6 +293,29 @@
     }
     .sign-out-btn:hover { border-color: var(--ocean); }
 
+    /* ── Voyage minimal topbar ───────────────────────────────────── */
+    .voyage-topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0 0;
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--smoke);
+    }
+    .voyage-topbar button {
+      background: none;
+      border: none;
+      color: var(--smoke);
+      font-family: var(--font-body);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .voyage-topbar button:hover { color: var(--parchment); }
+
     /* ── §D.1 — Countdown / hero ──────────────────────────────────── */
     .hero-section {
       padding: 80px 0 60px;
@@ -839,13 +862,9 @@
 
     <div class="inner">
 
-      <header class="app-header">
-        <p class="brand-title">Nassim's Folly</p>
-        <p class="brand-sub">with Roberto</p>
-        <div class="user-bar">
-          <span class="user-badge" id="voyageUserName"></span>
-          <button class="sign-out-btn" id="voyageSignOutBtn">Sign out</button>
-        </div>
+      <header class="voyage-topbar">
+        <span id="voyageUserName"></span>
+        <button id="voyageSignOutBtn">Sign out</button>
       </header>
 
       <section id="countdown" class="hero-section">
@@ -873,6 +892,17 @@
         </div>
         <h1 class="hero-title">Nassim's Folly <span class="hero-cross">×</span> Roberto</h1>
         <div class="hero-sub">25 May – 8 June 2027 · Tenerife</div>
+      </section>
+
+      <section id="briefs" class="page-section">
+        <div class="section-label" style="color: var(--terracotta);">
+          Expedition Briefs
+          <span id="briefsUnreadLabel" style="display:none; margin-left: 8px;
+            font-size: 10px; color: var(--terracotta);">● unread</span>
+        </div>
+        <div id="briefsFeed">
+          <p style="color: var(--iron); font-size: 14px;">No briefs yet. Watch this space.</p>
+        </div>
       </section>
 
       <section id="watch" class="page-section">
@@ -936,6 +966,7 @@
         <button class="tab-btn active" id="tabRSVP"      data-panel="panelRSVP">RSVP Dashboard</button>
         <button class="tab-btn"        id="tabAllowlist" data-panel="panelAllowlist">Allowlist</button>
         <button class="tab-btn"        id="tabDiary"     data-panel="panelDiary">Diary</button>
+        <button class="tab-btn"        id="tabBriefs"    data-panel="panelBriefs">Briefs</button>
       </div>
 
       <!-- Tab 1: RSVP Dashboard -->
@@ -1047,6 +1078,60 @@
         </div>
       </div>
 
+      <!-- Tab 4: Expedition Briefs -->
+      <div class="tab-panel" id="panelBriefs">
+        <h3 style="font-family:var(--font-display);font-size:1.4rem;color:var(--terracotta);margin-bottom:20px;">Expedition Briefs</h3>
+
+        <div class="brief-compose">
+          <input type="hidden" id="editBriefId">
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="form-group">
+              <label>Category</label>
+              <select id="composeCategory">
+                <option value="logistics">Logistics</option>
+                <option value="news">News</option>
+                <option value="reminder">Reminder</option>
+                <option value="important">Important</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Author</label>
+              <select id="composeAuthorBrief">
+                <option value="Robert">Robert</option>
+                <option value="Robert &amp; Nassim">Robert &amp; Nassim</option>
+                <option value="Nassim">Nassim</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="composeBriefTitle" placeholder="Airport transfers — confirm your arrival time">
+          </div>
+
+          <div class="form-group">
+            <label>Message <span style="font-weight:400;font-size:0.85rem;">(**bold**, *italic*, blank line = paragraph)</span></label>
+            <textarea id="composeBriefBody" rows="6" placeholder="We're coordinating a group transfer from Tenerife South on the 25th…"></textarea>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+              <input type="checkbox" id="composePinned"> Pin to top
+            </label>
+            <div style="display:flex; gap:10px;">
+              <button class="btn" id="cancelBriefEditBtn" onclick="cancelBriefEdit()" style="display:none; background:var(--light-gray);">Cancel edit</button>
+              <button class="btn btn-primary" onclick="publishBrief()">Post brief</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <h4 style="font-family:var(--font-display);font-size:1.2rem;color:var(--terracotta);margin-bottom:12px;">POSTED BRIEFS</h4>
+          <div id="adminBriefsList"></div>
+        </div>
+      </div>
+
       <footer class="voyage-footer" style="margin-top:32px">
         <div class="voyage-footer-links">
           <button class="footer-link" id="adminBackBtn">← Back</button>
@@ -1100,6 +1185,7 @@
     let isAdmin              = false;
     let adminChecked         = false;
     let diaryListenerActive  = false;
+    let briefsListenerActive = false;
     let scrollSpyActive      = false;
 
     // ── Countdown ─────────────────────────────────────────────────
@@ -1276,6 +1362,85 @@
       `).join('');
     }
 
+    // ── Expedition Briefs ─────────────────────────────────────────
+
+    function renderBriefs(briefs) {
+      const seenIds = JSON.parse(localStorage.getItem('seenBriefIds') || '[]');
+      const feed    = document.getElementById('briefsFeed');
+      const dot     = document.getElementById('briefsDot');
+      const label   = document.getElementById('briefsUnreadLabel');
+
+      if (briefs.length === 0) {
+        feed.innerHTML = '<p style="color:var(--iron);font-size:14px;">No briefs yet. Watch this space.</p>';
+        return;
+      }
+
+      const unread = briefs.filter(b => !seenIds.includes(b.id));
+      if (unread.length > 0) {
+        dot.style.display   = 'block';
+        label.style.display = 'inline';
+      }
+
+      const section = document.getElementById('briefs');
+      const seenObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          const allIds = briefs.map(b => b.id);
+          localStorage.setItem('seenBriefIds', JSON.stringify(allIds));
+          dot.style.display   = 'none';
+          label.style.display = 'none';
+          seenObserver.disconnect();
+        }
+      }, { threshold: 0.3 });
+      seenObserver.observe(section);
+
+      const sorted = [...briefs].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return  1;
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      feed.innerHTML = sorted.map(brief => {
+        const isUnread    = !seenIds.includes(brief.id);
+        const borderColor = isUnread ? 'var(--terracotta)' : 'var(--iron)';
+        const date        = new Date(brief.created_at).toLocaleDateString(
+                              'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        return `
+          <div class="brief-card card" style="border-left: 3px solid ${borderColor}; margin-bottom: 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <div style="font-family:var(--font-display); font-size:10px; font-weight:700;
+                          letter-spacing:3px; color:var(--terracotta); text-transform:uppercase;">
+                ${escapeHtml(brief.category)} · ${date}
+                ${brief.pinned ? ' · 📌' : ''}
+              </div>
+              ${isUnread ? '<span style="background:var(--terracotta); color:#fff; font-size:9px; font-weight:700; letter-spacing:2px; padding:3px 8px; border-radius:3px; text-transform:uppercase;">NEW</span>' : ''}
+            </div>
+            <div style="font-family:var(--font-display); font-size:20px; font-weight:700;
+                        color:var(--parchment); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">
+              ${escapeHtml(brief.title)}
+            </div>
+            <div style="font-size:14px; color:var(--smoke); line-height:1.7;">
+              ${renderMarkdown(brief.body)}
+            </div>
+            <div style="font-size:12px; color:var(--iron); margin-top:10px;">— ${escapeHtml(brief.author)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function initBriefsFeed() {
+      const briefsRef = query(
+        ref(db, 'content/announcements'),
+        orderByChild('created_at'),
+        limitToLast(20)
+      );
+      onValue(briefsRef, (snapshot) => {
+        const briefs = [];
+        snapshot.forEach(child => briefs.push({ id: child.key, ...child.val() }));
+        briefs.reverse();
+        renderBriefs(briefs);
+      });
+    }
+
     function showVoyagePage() {
       showScreen('screenVoyage');
       if (!scrollSpyActive) { scrollSpyActive = true; initScrollSpy(); }
@@ -1290,6 +1455,10 @@
       if (!diaryListenerActive) {
         diaryListenerActive = true;
         initDiaryFeed();
+      }
+      if (!briefsListenerActive) {
+        briefsListenerActive = true;
+        initBriefsFeed();
       }
     }
 
@@ -1786,6 +1955,111 @@
     window.editEntry    = editEntry;
     window.deleteEntry  = deleteEntry;
 
+    // ── Admin — Briefs ────────────────────────────────────────────
+
+    async function publishBrief() {
+      const editId = document.getElementById('editBriefId').value;
+
+      const brief = {
+        title:      document.getElementById('composeBriefTitle').value.trim(),
+        body:       document.getElementById('composeBriefBody').value.trim(),
+        author:     document.getElementById('composeAuthorBrief').value,
+        category:   document.getElementById('composeCategory').value,
+        pinned:     document.getElementById('composePinned').checked,
+        created_at: editId
+                      ? (await get(ref(db, `content/announcements/${editId}/created_at`))).val()
+                      : new Date().toISOString()
+      };
+
+      if (!brief.title || !brief.body) {
+        alert('Title and message are required.');
+        return;
+      }
+
+      const targetRef = editId
+        ? ref(db, `content/announcements/${editId}`)
+        : push(ref(db, 'content/announcements'));
+
+      await set(targetRef, brief);
+      clearBriefForm();
+      loadAdminBriefsList();
+    }
+
+    function loadAdminBriefsList() {
+      const briefsRef = query(
+        ref(db, 'content/announcements'),
+        orderByChild('created_at')
+      );
+      onValue(briefsRef, (snapshot) => {
+        const briefs = [];
+        snapshot.forEach(c => briefs.unshift({ id: c.key, ...c.val() }));
+        const list = document.getElementById('adminBriefsList');
+        if (!list) return;
+        if (briefs.length === 0) {
+          list.innerHTML = '<p style="color:var(--smoke);">No briefs posted yet.</p>';
+          return;
+        }
+        list.innerHTML = briefs.map(b => `
+          <div style="background:var(--charcoal); border-radius:8px; padding:14px;
+                      margin-bottom:10px; display:flex; justify-content:space-between;
+                      align-items:start; gap:12px;">
+            <div>
+              <strong style="font-family:var(--font-display); color:var(--parchment);
+                             font-size:1rem; text-transform:uppercase; letter-spacing:1px;">
+                ${escapeHtml(b.title)}
+              </strong>
+              <span style="color:var(--terracotta); font-size:0.8rem; margin-left:8px;">
+                ${escapeHtml(b.category)}${b.pinned ? ' · pinned' : ''}
+              </span>
+            </div>
+            <div style="display:flex; gap:8px; flex-shrink:0;">
+              <button class="btn" onclick="editBrief('${escapeHtml(b.id)}')"
+                      style="padding:6px 12px; font-size:0.85rem;">Edit</button>
+              <button class="delete-btn" onclick="deleteBrief('${escapeHtml(b.id)}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }, { onlyOnce: true });
+    }
+
+    function editBrief(id) {
+      get(ref(db, `content/announcements/${id}`)).then(snap => {
+        const b = snap.val();
+        document.getElementById('editBriefId').value        = id;
+        document.getElementById('composeBriefTitle').value  = b.title;
+        document.getElementById('composeBriefBody').value   = b.body;
+        document.getElementById('composeAuthorBrief').value = b.author;
+        document.getElementById('composeCategory').value    = b.category;
+        document.getElementById('composePinned').checked    = b.pinned || false;
+        document.getElementById('cancelBriefEditBtn').style.display = 'inline-block';
+        document.querySelector('.brief-compose').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
+    function cancelBriefEdit() { clearBriefForm(); }
+
+    function clearBriefForm() {
+      ['editBriefId', 'composeBriefTitle', 'composeBriefBody'].forEach(
+        id => { document.getElementById(id).value = ''; }
+      );
+      document.getElementById('composeAuthorBrief').value = 'Robert';
+      document.getElementById('composeCategory').value    = 'logistics';
+      document.getElementById('composePinned').checked    = false;
+      document.getElementById('cancelBriefEditBtn').style.display = 'none';
+    }
+
+    function deleteBrief(id) {
+      if (confirm('Delete this brief?')) {
+        remove(ref(db, `content/announcements/${id}`));
+        loadAdminBriefsList();
+      }
+    }
+
+    window.publishBrief     = publishBrief;
+    window.editBrief        = editBrief;
+    window.cancelBriefEdit  = cancelBriefEdit;
+    window.deleteBrief      = deleteBrief;
+
     // ── Scroll spy ────────────────────────────────────────────────
 
     function initScrollSpy() {
@@ -1818,6 +2092,7 @@
         if (btn.dataset.panel === 'panelRSVP')       loadRSVPTab();
         if (btn.dataset.panel === 'panelAllowlist')  loadAllowlistTab();
         if (btn.dataset.panel === 'panelDiary')      loadAdminDiaryList();
+        if (btn.dataset.panel === 'panelBriefs')     loadAdminBriefsList();
       });
     });
 
