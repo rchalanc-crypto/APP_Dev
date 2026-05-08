@@ -6,6 +6,54 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-05-07] — nassims-folly Phase 3.5: UI Redesign + Expedition Briefs [COMPLETED]
+
+### Summary
+
+**[FEATURE] Phase 3.5 complete — dark token system, sticky nav, RSVP reveal transition, voyage page redesign, Expedition Briefs.**
+
+**§A — Design tokens + fonts**
+- `:root` replaced: `--asphalt`, `--charcoal`, `--concrete`, `--iron`, `--smoke`, `--parchment`, `--neon`, `--terracotta`, `--ocean`; category tokens `--cat-*`
+- Three-family type system: `--font-display` (Barlow Condensed), `--font-diary` (Cormorant Garamond), `--font-body` (DM Sans)
+- All `'Bebas Neue'` references replaced with `var(--font-display)` via replace_all
+
+**§B — Global layout + sticky nav**
+- Tabler Icons CDN added; 7-item sticky nav with `id="stickyNav"`
+- Bottom-fixed on mobile (≤768px), top-fixed on tablet+; z-index 100
+- IntersectionObserver scroll spy updates active nav item; guarded by `scrollSpyActive` flag
+- `body` padding-bottom 70px (mobile) / padding-top 56px (tablet+)
+- `#briefsDot` (terracotta pill) + `#briefsNavItem` unread indicator wired to Briefs section
+
+**§C — RSVP screen light aesthetic**
+- `.rsvp-screen` retains cream background; `display:flex` removed (was causing CSS specificity bug that permanently showed RSVP card above voyage page)
+- `body.voyage-reveal` + `@keyframes darkReveal` transition fires once on RSVP yes → voyage route
+
+**§D — Voyage page section redesign**
+- Voyage screen `<header class="app-header">` replaced with `<header class="voyage-topbar">` — name + sign-out only, right-aligned, var(--smoke), DM Sans 13px; teal gradient removed
+- Hero countdown: 4-unit display (days/hrs/min/sec), days in `--neon`, others in `--parchment`; 1s tick interval; `--font-display` 72px
+- Sections rebuilt: `#countdown`, `#watch`, `#diary`, `#conditions`, `#ranker`, `#activities` — all with `.page-section` and `.section-label`
+- Diary cards updated to dark token system: `--charcoal` bg, neon border, `--font-diary` prose, `#222` keeper addendum with iron border
+
+**§E — Expedition Briefs**
+- New Firebase node: `/content/announcements/{pushId}` — title, body, author, category, pinned, created_at
+- `<section id="briefs">` inserted between hero and watch; terracotta section label
+- `renderBriefs()`: pinned-first sort; terracotta border + NEW badge on unread; IntersectionObserver marks all seen → writes seenBriefIds to localStorage; `briefsDot` + `briefsUnreadLabel` cleared
+- `initBriefsFeed()`: `onValue` on `content/announcements`, `orderByChild('created_at')`, `limitToLast(20)`; guarded by `briefsListenerActive`
+- Admin "Briefs" tab (4th): compose form with category/author/title/body/pin; `publishBrief`, `editBrief`, `cancelBriefEdit`, `clearBriefForm`, `deleteBrief`; all exposed on `window`
+- Tab-switching listener wired: `panelBriefs → loadAdminBriefsList()`
+
+### Bugs fixed during this phase
+
+- **JS SyntaxError:** `author: 'J'Dinklage Morgoone'` in `publishEntry()` and all three `seed-phase3.html` entries — ASCII apostrophe was terminating single-quoted strings. Fixed to double-quoted strings.
+- **CSS specificity:** `.rsvp-screen { display: flex }` was overriding `.screen { display: none }` via equal specificity + later cascade position. Removed layout properties from `.rsvp-screen`.
+
+### §F acceptance (automated checks)
+
+- No `console.log` of user data in index.html
+- All 7 section IDs present and match all 7 `data-section` nav attributes
+- 72 references to new CSS custom properties confirmed
+
+---
 ## [2026-05-07] — nassims-folly Phase 3: Diary, Fun Facts & Admin Compose [COMPLETED]
 
 ### Summary
