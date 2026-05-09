@@ -2588,13 +2588,15 @@
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
           `&current=wind_speed_10m,wind_direction_10m,weather_code,temperature_2m` +
           `&daily=weather_code,wind_speed_10m_max,precipitation_sum` +
-          `&wind_speed_unit=knots&timezone=auto&forecast_days=7`),
+          `&wind_speed_unit=kn&timezone=auto&forecast_days=7`),
         fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}` +
           `&current=wave_height&daily=wave_height_max&timezone=auto&forecast_days=5`)
       ]);
 
-      const wx     = await wxRes.json();
-      const marine = await marineRes.json();
+      if (!wxRes.ok) throw new Error(`Weather API ${wxRes.status} for ${lat},${lon}`);
+      const wx = await wxRes.json();
+      if (!wx.current) throw new Error(`Weather API bad payload: ${JSON.stringify(wx).slice(0,200)}`);
+      const marine = marineRes.ok ? await marineRes.json() : { current: {}, daily: {} };
       const data   = { wx, marine };
 
       localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
