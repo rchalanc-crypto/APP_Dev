@@ -203,57 +203,303 @@
             display: block;
         }
 
-        /* Calendar */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+        /* Availability — 14 days × AM/PM/EVE chips (v2) */
+        .slot-list {
             margin-top: 20px;
         }
 
-        .calendar-header {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.1rem;
-            color: var(--trail-green);
-            text-align: center;
-            padding: 10px;
-        }
-
-        .availability-slot {
+        .slot-day {
             background: var(--cream);
             border: 2px solid var(--light-gray);
-            border-radius: 8px;
-            padding: 12px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 100px;
-        }
-
-        .availability-slot:hover {
-            border-color: var(--moss);
-            transform: scale(1.05);
-        }
-
-        .availability-slot .date {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-        }
-
-        .availability-slot .users {
-            font-size: 0.85rem;
-            margin-top: 8px;
-        }
-
-        .user-pill {
-            display: inline-block;
-            background: var(--trail-green);
-            color: white;
-            padding: 3px 8px;
             border-radius: 10px;
-            margin: 2px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .slot-day.today {
+            border-color: var(--ocean);
+        }
+
+        .slot-day-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .slot-day-head .today-tag {
             font-size: 0.75rem;
+            color: var(--ocean);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slot-chips {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chip {
+            flex: 1;
+            min-height: 44px;
+            border: 2px solid var(--light-gray);
+            border-radius: 22px;
+            background: white;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--moss);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .chip.on {
+            background: var(--trail-green);
+            border-color: var(--trail-green);
+            color: white;
+        }
+
+        .slot-others {
+            margin-top: 8px;
+            font-size: 0.82rem;
+            color: var(--moss);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .other-slot-pill {
+            display: inline-block;
+            background: var(--light-gray);
+            border-radius: 8px;
+            padding: 1px 8px;
+            margin-left: 5px;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.75rem;
+        }
+
+        /* Weather cards (v2) */
+        .wx-card {
+            background: var(--cream);
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .wx-card h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            color: var(--ocean);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .wx-card.mtb h3 {
+            color: var(--trail-green);
+        }
+
+        .wx-asof {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            letter-spacing: 0;
+            color: var(--moss);
+        }
+
+        .wx-error {
+            color: var(--orange);
+            font-weight: 600;
+            padding: 12px 0;
+        }
+
+        .wx-day {
+            margin-top: 14px;
+        }
+
+        .wx-day-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px;
+            font-size: 0.9rem;
+        }
+
+        .wx-day-head .day-name {
+            font-weight: 700;
+        }
+
+        .wx-conf {
+            font-size: 0.78rem;
+            color: var(--moss);
+        }
+
+        .gradient-line {
+            font-size: 0.82rem;
+            margin: 3px 0 6px;
+            color: var(--moss);
+        }
+
+        .gradient-line .g-strong { color: var(--trail-green); font-weight: 700; }
+        .gradient-line .g-moderate { color: var(--orange); font-weight: 700; }
+        .gradient-line .g-weak { color: var(--moss); font-weight: 700; }
+
+        .hour-strip {
+            display: flex;
+            gap: 3px;
+            overflow-x: auto;
+            padding: 4px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .hour-cell {
+            min-width: 36px;
+            text-align: center;
+            border-radius: 6px;
+            padding: 4px 2px;
+            background: white;
+            border: 1px solid transparent;
+            font-size: 0.65rem;
+            color: var(--moss);
+            flex-shrink: 0;
+        }
+
+        .hour-cell.in-window {
+            background: rgba(43, 107, 138, 0.10);
+            border-color: var(--ocean);
+        }
+
+        .hour-cell .kn {
+            display: block;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .hour-cell .arrow {
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+
+        .hour-cell.w-low .kn { color: var(--moss); }
+        .hour-cell.w-mid .kn { color: var(--orange); }
+        .hour-cell.w-high .kn { color: var(--ocean); }
+
+        /* Coquitlam daily grid */
+        .daily-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .daily-cell {
+            background: white;
+            border-radius: 8px;
+            padding: 10px 4px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .daily-cell .icon { font-size: 1.5rem; display: block; }
+        .daily-cell .temps { font-weight: 700; }
+        .daily-cell .precip { color: var(--moss); font-size: 0.72rem; }
+
+        /* Activity ranker */
+        .ranker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 16px 0 24px;
+        }
+
+        .call-card {
+            background: white;
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .call-card .call-day {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--moss);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .call-tag {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.7rem;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            margin: 2px 0;
+        }
+
+        .call-KITE { color: var(--ocean); }
+        .call-MTB { color: var(--trail-green); }
+        .call-EITHER { color: var(--dirt); }
+        .call-NEITHER { color: #8a8a8a; }
+
+        .call-wind { font-size: 0.85rem; font-weight: 700; }
+        .call-conf { font-size: 0.75rem; color: var(--moss); margin-top: 2px; }
+        .call-note { font-size: 0.78rem; color: var(--moss); margin-top: 6px; font-style: italic; }
+
+        /* Second opinions (lazy embeds) */
+        details.second-opinion {
+            background: var(--cream);
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+
+        details.second-opinion summary {
+            cursor: pointer;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            color: var(--ocean);
+        }
+
+        .sws-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .sws-btn {
+            background: var(--ocean);
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .embed-box { margin-top: 14px; }
+
+        .embed-box iframe {
+            width: 100%;
+            height: 420px;
+            border: 0;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .content { padding: 22px 14px; }
+            h1 { font-size: 2.8rem; }
+            .daily-row { grid-template-columns: repeat(2, 1fr); }
+            .ranker-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         /* Forms */
@@ -534,6 +780,7 @@
 
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('availability')">📅 Availability</button>
+                <button class="tab" onclick="switchTab('weather')">🌤️ Weather</button>
                 <button class="tab" onclick="switchTab('logger')">📝 Log Session</button>
                 <button class="tab" onclick="switchTab('history')">📜 History</button>
                 <button class="tab" onclick="switchTab('stats')">📊 Stats</button>
@@ -546,9 +793,43 @@
                         Mark Your Availability
                     </h2>
                     <p style="margin-bottom: 20px; color: var(--moss);">
-                        Click dates to toggle your availability. Updates in real-time for everyone!
+                        Tap AM / PM / EVE to toggle your slots. Everyone's availability updates in real-time.
                     </p>
-                    <div class="calendar-grid" id="calendar"></div>
+                    <div class="slot-list" id="slotList"></div>
+                </div>
+
+                <!-- Weather + Today's Call -->
+                <div id="weather" class="view">
+                    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--trail-green); margin-bottom: 10px;">
+                        Today's Call: MTB or Kite
+                    </h2>
+                    <div class="ranker-grid" id="rankerGrid">
+                        <div class="loading">Crunching the models…</div>
+                    </div>
+
+                    <div class="wx-card" id="squamishCard">
+                        <h3>🪁 Squamish Spit — wind ensemble <span class="wx-asof" id="squamishAsOf"></span></h3>
+                        <div id="squamishBody"><div class="loading">Loading…</div></div>
+                    </div>
+
+                    <div class="wx-card mtb" id="coquitlamCard">
+                        <h3>🚵 Coquitlam — trail weather <span class="wx-asof" id="coquitlamAsOf"></span></h3>
+                        <div id="coquitlamBody"><div class="loading">Loading…</div></div>
+                    </div>
+
+                    <details class="second-opinion" id="secondOpinion">
+                        <summary>Second opinions — Windy · Windfinder · SWS</summary>
+                        <div class="sws-links">
+                            <a class="sws-btn" href="https://squamishwindsports.com/conditions/wind/" target="_blank" rel="noopener">Live wind → SWS</a>
+                            <a class="sws-btn" href="https://squamishwindsports.com/conditions/webcams/" target="_blank" rel="noopener">Spit webcam → SWS</a>
+                            <span class="wx-asof">webcam streams 11am–7pm</span>
+                        </div>
+                        <!-- iframes are injected on first expand only — they must never block first paint -->
+                        <div class="embed-box" data-title="Windy — wind layer, Squamish Spit"
+                             data-src="https://embed.windy.com/embed2.html?lat=49.70&lon=-123.155&detailLat=49.70&detailLon=-123.155&zoom=10&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=true&calendar=now&type=map&location=coordinates&metricWind=kt&metricTemp=%C2%B0C"></div>
+                        <div class="embed-box" data-title="Windfinder — Squamish Spit forecast"
+                             data-src="https://www.windfinder.com/widget/forecast/squamish_spit?unit_wind=kts&unit_rain=mm&unit_temperature=c&days=4&show_day=1"></div>
+                    </details>
                 </div>
 
                 <!-- Logger -->
@@ -641,6 +922,413 @@ const firebaseConfig = {
             window.useLocalStorage = true;
         }
 
+        // ════════════════════════════════════════════════════════════════════
+        // TUNING CONSTANTS — the only block Robert + Glenn should need to edit.
+        // Thresholds are starting defaults; tune after a few weeks of reality.
+        // ════════════════════════════════════════════════════════════════════
+
+        // Ensemble fetch config — copied from shared/snippets/weather-ensemble.js.
+        // Per repo convention, divergence between apps lives ONLY in constants.
+        const WX_ENS = {
+            // "seamless" variants let Open-Meteo pick the best resolution member
+            // of each family for the location.
+            MODELS: ['gfs_seamless', 'ecmwf_ifs025', 'icon_seamless', 'gem_seamless'],
+            CACHE_TTL_MS: 2 * 60 * 60 * 1000,   // 2 hours
+            FORECAST_DAYS: 4,                   // today + 3
+            WINDOW_START_H: 11,                 // Squamish thermal window 11:00–17:00
+            WINDOW_END_H: 17,
+            // Confidence from model spread (max−min of per-model window medians, kn).
+            SPREAD_HIGH_KN: 5,                  // spread < 5  → high confidence
+            SPREAD_MODERATE_KN: 10              // spread < 10 → moderate; else disagree
+        };
+
+        const SPOTS = {
+            squamish:  { name: 'Squamish Spit', lat: 49.70, lon: -123.155 },
+            coquitlam: { name: 'Coquitlam',     lat: 49.28, lon: -122.79  }
+        };
+
+        // Activity ranker thresholds (sustained window median, kn; day precip, mm).
+        const RANKER = {
+            KITE_MIN_KN: 18,
+            MTB_MAX_KN: 12,
+            DAY_PRECIP_MAX_MM: 5,
+            MARGINAL_KITE_KN: 3,   // KITE-miss within this of KITE_MIN_KN counts as marginal
+            SUNNY_WMO_MAX: 2,      // WMO code ≤ 2 = forecast-sunny (gradient-fallback caveat)
+            CONF_LABELS: {         // ride-tracker rewording of the shared confidence bands
+                high:     'high confidence',
+                moderate: 'moderate confidence',
+                disagree: 'models disagree — check the second opinions'
+            }
+        };
+
+        // Thermal gradient: interior − coastal temp at AT_HOUR drives the Spit's
+        // inflow. Points are starting defaults. If this proves unfaithful, the
+        // noted alternative source is Environment Canada GeoMet (api.weather.gc.ca).
+        const GRADIENT = {
+            INTERIOR: { name: 'Pemberton', lat: 50.32, lon: -122.80 },
+            COASTAL:  { name: 'Vancouver', lat: 49.29, lon: -123.12 },
+            AT_HOUR: 14,           // forecast hour the gradient is computed at
+            STRONG_C: 8,           // ≥ 8°C strong / 4–8 moderate / < 4 weak
+            MODERATE_C: 4
+        };
+
+        // Squamish card hour strip — display range only (window is highlighted within).
+        const DISPLAY_START_H = 8, DISPLAY_END_H = 20;
+
+        // Availability: 14-day forward cap is enforced client-side — rules can't
+        // cheaply compare date-string keys to now (accepted tradeoff, see SPEC-V2 §3).
+        const AVAIL_DAYS = 14;
+        const AVAIL_SLOTS = ['am', 'pm', 'eve'];
+        const SLOT_LABELS = { am: 'AM', pm: 'PM', eve: 'EVE' };
+
+        // ════════════════════════════════════════════════════════════════════
+        // Weather ensemble — fetch/cache/median/spread copied verbatim from
+        // shared/snippets/weather-ensemble.js. Bug fixes must be ported back to
+        // the reference snippet and to apps/nassims-folly.
+        // ════════════════════════════════════════════════════════════════════
+
+        async function fetchEnsembleWind(lat, lon, C = WX_ENS) {
+            const cacheKey = `wxens_${lat}_${lon}_${C.MODELS.join('-')}`;
+            const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+            if (cached && Date.now() - cached.ts < C.CACHE_TTL_MS) {
+                return { ...cached.data, asOf: new Date(cached.ts), fromCache: true };
+            }
+
+            // wind_speed_unit must be "kn" — "knots" is rejected with HTTP 400.
+            const res = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+                `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m` +
+                `&models=${C.MODELS.join(',')}` +
+                `&wind_speed_unit=kn&timezone=auto&forecast_days=${C.FORECAST_DAYS}`
+            );
+            if (!res.ok) throw new Error(`Ensemble API ${res.status} for ${lat},${lon}`);
+            const raw = await res.json();
+            if (!raw.hourly || !raw.hourly.time) {
+                throw new Error(`Ensemble API bad payload: ${JSON.stringify(raw).slice(0, 200)}`);
+            }
+
+            const models = {};
+            for (const m of C.MODELS) {
+                const speed = raw.hourly[`wind_speed_10m_${m}`];
+                // Skip models with no coverage at this point (null-filled or absent).
+                if (!speed || !speed.some(v => v != null)) continue;
+                models[m] = {
+                    speed,
+                    gusts: raw.hourly[`wind_gusts_10m_${m}`] || [],
+                    dir:   raw.hourly[`wind_direction_10m_${m}`] || []
+                };
+            }
+            const data = { hourly: { time: raw.hourly.time, models } };
+
+            localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+            return { ...data, asOf: new Date(), fromCache: false };
+        }
+
+        function median(values) {
+            const v = values.filter(x => x != null).sort((a, b) => a - b);
+            if (!v.length) return null;
+            const mid = Math.floor(v.length / 2);
+            return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+        }
+
+        // Per-day window stats across models: per-model window medians, then the
+        // median of those. Spread = max − min of per-model sustained medians.
+        function windowStats(ens, dayIndex, C = WX_ENS) {
+            const idx = [];
+            ens.hourly.time.forEach((t, i) => {
+                const h = parseInt(t.slice(11, 13), 10);
+                const d = Math.floor(i / 24); // 24 hourly rows per local day
+                if (d === dayIndex && h >= C.WINDOW_START_H && h < C.WINDOW_END_H) idx.push(i);
+            });
+            if (!idx.length) return null;
+
+            const perModelWind = [], perModelGust = [];
+            for (const m of Object.values(ens.hourly.models)) {
+                const w = median(idx.map(i => m.speed[i]));
+                const g = median(idx.map(i => m.gusts[i]));
+                if (w != null) perModelWind.push(w);
+                if (g != null) perModelGust.push(g);
+            }
+            if (!perModelWind.length) return null;
+
+            return {
+                medianWind: median(perModelWind),
+                medianGust: median(perModelGust),
+                spreadKn:   Math.max(...perModelWind) - Math.min(...perModelWind),
+                modelCount: perModelWind.length
+            };
+        }
+
+        function confidenceBand(spreadKn, C = WX_ENS) {
+            if (spreadKn < C.SPREAD_HIGH_KN)     return { band: 'high',     label: 'models agree' };
+            if (spreadKn < C.SPREAD_MODERATE_KN) return { band: 'moderate', label: 'models mostly agree' };
+            return { band: 'disagree', label: 'models disagree — low confidence' };
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // Ride-tracker weather layer (daily cards, gradient, ranker)
+        // ════════════════════════════════════════════════════════════════════
+
+        const esc = s => String(s).replace(/[&<>"']/g,
+            c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        // Same cache discipline as the ensemble: 2h TTL, age always shown in the UI.
+        async function cachedJson(cacheKey, url) {
+            const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+            if (cached && Date.now() - cached.ts < WX_ENS.CACHE_TTL_MS) {
+                return { data: cached.data, asOf: new Date(cached.ts), fromCache: true };
+            }
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`API ${res.status} for ${cacheKey}`);
+            const data = await res.json();
+            localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+            return { data, asOf: new Date(), fromCache: false };
+        }
+
+        // Daily forecast for both spots in one call (multi-location → array response).
+        async function fetchDailyWx() {
+            const { data, asOf, fromCache } = await cachedJson('wxdaily_sq-coq',
+                `https://api.open-meteo.com/v1/forecast` +
+                `?latitude=${SPOTS.squamish.lat},${SPOTS.coquitlam.lat}` +
+                `&longitude=${SPOTS.squamish.lon},${SPOTS.coquitlam.lon}` +
+                `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max` +
+                `&timezone=auto&forecast_days=${WX_ENS.FORECAST_DAYS}`);
+            const arr = Array.isArray(data) ? data : [data];
+            if (!arr[0] || !arr[0].daily || !arr[1] || !arr[1].daily) {
+                throw new Error('Daily API bad payload');
+            }
+            return { squamish: arr[0].daily, coquitlam: arr[1].daily, asOf, fromCache };
+        }
+
+        // Interior − coastal temp at GRADIENT.AT_HOUR, per day.
+        async function fetchGradient() {
+            const { data, asOf, fromCache } = await cachedJson('wxgrad_interior-coastal',
+                `https://api.open-meteo.com/v1/forecast` +
+                `?latitude=${GRADIENT.INTERIOR.lat},${GRADIENT.COASTAL.lat}` +
+                `&longitude=${GRADIENT.INTERIOR.lon},${GRADIENT.COASTAL.lon}` +
+                `&hourly=temperature_2m&timezone=America/Vancouver&forecast_days=${WX_ENS.FORECAST_DAYS}`);
+            const arr = Array.isArray(data) ? data : [data];
+            const interior = arr[0] && arr[0].hourly && arr[0].hourly.temperature_2m;
+            const coastal  = arr[1] && arr[1].hourly && arr[1].hourly.temperature_2m;
+            if (!interior || !coastal) throw new Error('Gradient API bad payload');
+            const perDay = [];
+            for (let d = 0; d < WX_ENS.FORECAST_DAYS; d++) {
+                const i = d * 24 + GRADIENT.AT_HOUR;
+                perDay.push(interior[i] != null && coastal[i] != null
+                    ? Math.round((interior[i] - coastal[i]) * 10) / 10 : null);
+            }
+            return { perDay, asOf, fromCache };
+        }
+
+        function gradientBand(g) {
+            if (g >= GRADIENT.STRONG_C)   return 'strong';
+            if (g >= GRADIENT.MODERATE_C) return 'moderate';
+            return 'weak';
+        }
+
+        function fmtAsOf({ asOf, fromCache }) {
+            const hh = String(asOf.getHours()).padStart(2, '0');
+            const mm = String(asOf.getMinutes()).padStart(2, '0');
+            return `as of ${hh}:${mm}${fromCache ? ' (cached)' : ''}`;
+        }
+
+        function dayLabel(offset) {
+            const d = new Date();
+            d.setDate(d.getDate() + offset);
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            return offset === 0 ? 'Today' : `${days[d.getDay()]} ${d.getDate()}`;
+        }
+
+        function wmoIcon(code) {
+            if (code == null) return '·';
+            if (code <= 1) return '☀️';
+            if (code <= 2) return '🌤️';
+            if (code <= 3) return '☁️';
+            if (code <= 48) return '🌫️';
+            if (code <= 57) return '🌦️';
+            if (code <= 67) return '🌧️';
+            if (code <= 77) return '🌨️';
+            if (code <= 82) return '🌧️';
+            if (code <= 86) return '🌨️';
+            return '⛈️';
+        }
+
+        // Cross-model median for one hourly index.
+        function hourMedian(ens, i, key) {
+            return median(Object.values(ens.hourly.models).map(m => m[key][i]));
+        }
+
+        function showWxError(elId, msg) {
+            document.getElementById(elId).innerHTML =
+                `<div class="wx-error">⚠️ ${esc(msg)} — try the second opinions below.</div>`;
+        }
+
+        // ── Activity ranker ──────────────────────────────────────────────────
+        // Day precip is judged per venue: rain at the Spit kills KITE, rain on the
+        // trails kills MTB; both wet = garage day.
+        function rankDay(medianWind, sqPrecip, coqPrecip, C = RANKER) {
+            const sqWet  = sqPrecip  >= C.DAY_PRECIP_MAX_MM;
+            const coqWet = coqPrecip >= C.DAY_PRECIP_MAX_MM;
+            if (sqWet && coqWet) return 'NEITHER';
+            if (medianWind >= C.KITE_MIN_KN && !sqWet) return 'KITE';
+            if (medianWind >= C.MTB_MAX_KN && medianWind < C.KITE_MIN_KN && !sqWet && !coqWet) return 'EITHER';
+            if (!coqWet) return 'MTB';
+            return 'NEITHER';
+        }
+
+        function renderRanker(ens, daily, grad) {
+            const grid = document.getElementById('rankerGrid');
+            if (!ens || !daily) {
+                grid.innerHTML = '<div class="wx-error">⚠️ Weather unavailable — no call today. Check the second opinions below.</div>';
+                return;
+            }
+            let html = '';
+            for (let d = 0; d < WX_ENS.FORECAST_DAYS; d++) {
+                const stats = windowStats(ens, d);
+                const sqP  = daily.squamish.precipitation_sum[d];
+                const coqP = daily.coquitlam.precipitation_sum[d];
+                if (!stats || sqP == null || coqP == null) {
+                    html += `<div class="call-card"><div class="call-day">${dayLabel(d)}</div>
+                             <div class="call-tag call-NEITHER">NO DATA</div></div>`;
+                    continue;
+                }
+
+                let call = rankDay(stats.medianWind, sqP, coqP);
+                let tagText = call, note = '';
+                const conf = confidenceBand(stats.spreadKn);
+                const dry = sqP < RANKER.DAY_PRECIP_MAX_MM;
+                const marginalKiteMiss = stats.medianWind >= RANKER.KITE_MIN_KN - RANKER.MARGINAL_KITE_KN
+                                      && stats.medianWind <  RANKER.KITE_MIN_KN;
+                const g = grad && grad.perDay[d];
+
+                // Thermal signal: upgrade EITHER / marginal KITE-miss days when the
+                // gradient is strong and the day is dry.
+                if ((call === 'EITHER' || marginalKiteMiss) && dry) {
+                    if (g != null && g >= GRADIENT.STRONG_C) {
+                        call = 'KITE';
+                        tagText = 'KITE (thermal likely)';
+                        note = `gradient ${g}°C — models underpredict the Spit on days like this.`;
+                    } else if (grad == null && daily.squamish.weather_code[d] <= RANKER.SUNNY_WMO_MAX) {
+                        // Gradient fetch failed: static caveat on forecast-sunny days.
+                        note = 'Squamish inflow often beats the models — marginal KITE days may deliver.';
+                    }
+                }
+                if (call === 'NEITHER' && !note) note = 'garage day — wrench something.';
+
+                html += `<div class="call-card">
+                    <div class="call-day">${dayLabel(d)}</div>
+                    <div class="call-tag call-${call}">${tagText}</div>
+                    <div class="call-wind">${Math.round(stats.medianWind)} kn · gusts ${Math.round(stats.medianGust)}</div>
+                    <div class="call-conf">${RANKER.CONF_LABELS[conf.band]}</div>
+                    ${note ? `<div class="call-note">${note}</div>` : ''}
+                </div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function renderSquamish(ens) {
+            document.getElementById('squamishAsOf').textContent = fmtAsOf(ens);
+            let html = '';
+            for (let d = 0; d < WX_ENS.FORECAST_DAYS; d++) {
+                const stats = windowStats(ens, d);
+                const conf = stats && confidenceBand(stats.spreadKn);
+                let cells = '';
+                for (let h = DISPLAY_START_H; h < DISPLAY_END_H; h++) {
+                    const i = d * 24 + h;
+                    if (i >= ens.hourly.time.length) break;
+                    const w = hourMedian(ens, i, 'speed');
+                    const gu = hourMedian(ens, i, 'gusts');
+                    // Direction median is safe here: Spit inflow is consistently
+                    // S–SE, far from the 0/360 wrap.
+                    const dir = hourMedian(ens, i, 'dir');
+                    if (w == null) continue;
+                    const inWin = h >= WX_ENS.WINDOW_START_H && h < WX_ENS.WINDOW_END_H;
+                    const cls = w >= RANKER.KITE_MIN_KN ? 'w-high' : w >= RANKER.MTB_MAX_KN ? 'w-mid' : 'w-low';
+                    cells += `<div class="hour-cell ${cls}${inWin ? ' in-window' : ''}">
+                        <span class="arrow" style="transform:rotate(${Math.round(dir ?? 0)}deg)">↓</span>
+                        <span class="kn">${Math.round(w)}</span>
+                        <span>g${Math.round(gu ?? 0)}</span>
+                        <span>${h}h</span>
+                    </div>`;
+                }
+                html += `<div class="wx-day">
+                    <div class="wx-day-head">
+                        <span class="day-name">${dayLabel(d)}</span>
+                        <span class="wx-conf">${stats
+                            ? `window median ${Math.round(stats.medianWind)} kn · gusts ${Math.round(stats.medianGust)} · ${conf.label} (${stats.modelCount} models)`
+                            : 'no window data'}</span>
+                    </div>
+                    <div class="gradient-line" id="gradLine-${d}">Thermal gradient: …</div>
+                    <div class="hour-strip">${cells}</div>
+                </div>`;
+            }
+            document.getElementById('squamishBody').innerHTML = html;
+        }
+
+        // Gradient readout per day in the Squamish card (fills the placeholders).
+        function renderGradientLines(grad) {
+            for (let d = 0; d < WX_ENS.FORECAST_DAYS; d++) {
+                const el = document.getElementById(`gradLine-${d}`);
+                if (!el) continue;
+                const g = grad && grad.perDay[d];
+                if (g == null) {
+                    el.textContent = 'Thermal gradient: unavailable';
+                    continue;
+                }
+                const band = gradientBand(g);
+                el.innerHTML = `Thermal gradient: <span class="g-${band}">${g}°C — ${band}</span>` +
+                               ` <span class="wx-asof">(${esc(GRADIENT.INTERIOR.name)} − ${esc(GRADIENT.COASTAL.name)} @ ${GRADIENT.AT_HOUR}:00)</span>`;
+            }
+        }
+
+        function renderCoquitlam(daily) {
+            document.getElementById('coquitlamAsOf').textContent = fmtAsOf(daily);
+            const dd = daily.coquitlam;
+            let cells = '';
+            for (let d = 0; d < WX_ENS.FORECAST_DAYS; d++) {
+                cells += `<div class="daily-cell">
+                    <div class="call-day">${dayLabel(d)}</div>
+                    <span class="icon">${wmoIcon(dd.weather_code[d])}</span>
+                    <div class="temps">${Math.round(dd.temperature_2m_max[d])}° / ${Math.round(dd.temperature_2m_min[d])}°</div>
+                    <div class="precip">💧 ${dd.precipitation_probability_max[d] ?? '–'}% · ${dd.precipitation_sum[d] ?? '–'} mm</div>
+                </div>`;
+            }
+            document.getElementById('coquitlamBody').innerHTML = `<div class="daily-row">${cells}</div>`;
+        }
+
+        // Orchestrator: three independent fetches; each card renders or shows its
+        // own error. The gradient failing must never block the ranker.
+        async function loadWeather() {
+            const pEns   = fetchEnsembleWind(SPOTS.squamish.lat, SPOTS.squamish.lon);
+            const pDaily = fetchDailyWx();
+            const pGrad  = fetchGradient().catch(e => { console.warn('gradient fetch failed', e); return null; });
+
+            let ens = null, daily = null;
+            try { ens = await pEns; renderSquamish(ens); }
+            catch (e) { console.warn(e); showWxError('squamishBody', 'wind data unavailable'); }
+
+            try { daily = await pDaily; renderCoquitlam(daily); }
+            catch (e) { console.warn(e); showWxError('coquitlamBody', 'forecast unavailable'); }
+
+            const grad = await pGrad;
+            renderGradientLines(grad);
+            renderRanker(ens, daily, grad);
+        }
+
+        // Second-opinion embeds: injected on first expand only (lazy-load is
+        // mandatory — iframes must not block first paint).
+        document.getElementById('secondOpinion').addEventListener('toggle', function () {
+            if (!this.open) return;
+            this.querySelectorAll('.embed-box[data-src]').forEach(box => {
+                const f = document.createElement('iframe');
+                f.src = box.dataset.src;
+                f.loading = 'lazy';
+                f.title = box.dataset.title || 'forecast embed';
+                box.appendChild(f);
+                box.removeAttribute('data-src');
+            });
+        });
+
         let currentUser = null;
 
         // Login
@@ -675,7 +1363,8 @@ const firebaseConfig = {
         // Initialize app
         function init() {
             document.getElementById('sessionDate').valueAsDate = new Date();
-            
+            loadWeather();
+
             if (window.useLocalStorage) {
                 loadLocalData();
             } else {
@@ -688,8 +1377,8 @@ const firebaseConfig = {
             // Listen to availability
             const availRef = ref(db, 'availability');
             onValue(availRef, (snapshot) => {
-                const data = snapshot.val() || {};
-                renderCalendar(data);
+                availabilityData = snapshot.val() || {};
+                renderSlots();
             });
 
             // Listen to sessions
@@ -706,73 +1395,72 @@ const firebaseConfig = {
             });
         }
 
-        // Toggle availability
-        window.toggleAvailability = function(dateStr) {
-            const availRef = ref(db, `availability/${dateStr}/${currentUser}`);
-            
-            // Get current state
-            onValue(availRef, (snapshot) => {
-                const isAvailable = snapshot.val();
-                if (isAvailable) {
-                    remove(availRef);
-                } else {
-                    set(availRef, true);
-                }
-            }, { onlyOnce: true });
+        // ── Availability: 14 days × AM/PM/EVE chips ──────────────────────────
+        let availabilityData = {};
+
+        // Local-time date key (toISOString flips to tomorrow's date after 5pm
+        // Pacific — keys must match what the user sees).
+        function localDateStr(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        // Legacy tolerance: boolean true (v1 shape) renders as all-day; converts
+        // to the object shape on that user's first edit of that date.
+        function normSlots(v) {
+            if (v === true) return { am: true, pm: true, eve: true };
+            if (v && typeof v === 'object') return { am: !!v.am, pm: !!v.pm, eve: !!v.eve };
+            return { am: false, pm: false, eve: false };
+        }
+
+        window.toggleSlot = function(dateStr, slot) {
+            const cur = normSlots((availabilityData[dateStr] || {})[currentUser]);
+            cur[slot] = !cur[slot];
+            const userRef = ref(db, `availability/${dateStr}/${currentUser}`);
+            if (!cur.am && !cur.pm && !cur.eve) {
+                remove(userRef);
+            } else {
+                set(userRef, cur);
+            }
         };
 
-        // Render calendar
-        function renderCalendar(availabilityData) {
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = '';
-
+        function renderSlots() {
+            const list = document.getElementById('slotList');
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            days.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'calendar-header';
-                header.textContent = day;
-                calendar.appendChild(header);
-            });
-
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const today = new Date();
-            const startDayOfWeek = today.getDay();
+            let html = '';
 
-            for (let i = 0; i < startDayOfWeek; i++) {
-                calendar.appendChild(document.createElement('div'));
-            }
-
-            for (let i = 0; i < 14; i++) {
+            for (let i = 0; i < AVAIL_DAYS; i++) {
                 const date = new Date(today);
                 date.setDate(today.getDate() + i);
-                const dateStr = date.toISOString().split('T')[0];
-                const dayOfWeek = days[date.getDay()];
+                const dateStr = localDateStr(date);
+                const dayData = availabilityData[dateStr] || {};
+                const mine = normSlots(dayData[currentUser]);
 
-                const usersAvailable = availabilityData[dateStr] || {};
-                const userNames = Object.keys(usersAvailable);
-                const isCurrentUserAvailable = usersAvailable[currentUser];
+                const chips = AVAIL_SLOTS.map(s =>
+                    `<button class="chip${mine[s] ? ' on' : ''}" onclick="toggleSlot('${dateStr}','${s}')"
+                             aria-pressed="${mine[s]}">${SLOT_LABELS[s]}</button>`).join('');
 
-                const slot = document.createElement('div');
-                slot.className = 'availability-slot';
-                
-                slot.innerHTML = `
-                    <div class="date">${date.getDate()}</div>
-                    <div style="font-size: 0.75rem; color: var(--moss);">${dayOfWeek}</div>
-                    <div class="users">
-                        ${userNames.length > 0 
-                            ? userNames.map(name => `<span class="user-pill">${name}</span>`).join('')
-                            : '<span style="color: var(--moss); font-size: 0.8rem;">Tap to mark</span>'
-                        }
+                const others = Object.keys(dayData)
+                    .filter(u => u !== currentUser)
+                    .map(u => {
+                        const sl = normSlots(dayData[u]);
+                        const on = AVAIL_SLOTS.filter(s => sl[s]);
+                        return on.length
+                            ? `<div>${esc(u)}${on.map(s => `<span class="other-slot-pill">${SLOT_LABELS[s]}</span>`).join('')}</div>`
+                            : '';
+                    }).join('');
+
+                html += `<div class="slot-day${i === 0 ? ' today' : ''}">
+                    <div class="slot-day-head">
+                        <span>${days[date.getDay()]} <b>${date.getDate()}</b> ${months[date.getMonth()]}</span>
+                        ${i === 0 ? '<span class="today-tag">today</span>' : ''}
                     </div>
-                `;
-
-                if (isCurrentUserAvailable) {
-                    slot.style.borderColor = 'var(--trail-green)';
-                    slot.style.background = 'linear-gradient(135deg, rgba(45,90,61,0.1), rgba(90,122,90,0.1))';
-                }
-
-                slot.onclick = () => toggleAvailability(dateStr);
-                calendar.appendChild(slot);
+                    <div class="slot-chips">${chips}</div>
+                    ${others ? `<div class="slot-others">${others}</div>` : ''}
+                </div>`;
             }
+            list.innerHTML = html;
         }
 
         // Session form
@@ -826,11 +1514,11 @@ const firebaseConfig = {
                         <div class="session-type">${session.type === 'mtb' ? '🚵 MTB Ride' : '🪁 Kite Session'}</div>
                         <div class="session-meta">
                             <div class="session-date">${new Date(session.date).toLocaleDateString()}</div>
-                            <div class="session-user">by ${session.user}</div>
+                            <div class="session-user">by ${esc(session.user)}</div>
                         </div>
                     </div>
-                    <div class="session-location">📍 ${session.location}</div>
-                    ${session.notes ? `<div class="session-notes">${session.notes}</div>` : ''}
+                    <div class="session-location">📍 ${esc(session.location)}</div>
+                    ${session.notes ? `<div class="session-notes">${esc(session.notes)}</div>` : ''}
                     ${session.user === currentUser ? `<button class="delete-btn" onclick="deleteSession('${session.id}')">Delete</button>` : ''}
                 </div>
             `).join('');
@@ -882,7 +1570,7 @@ const firebaseConfig = {
                         .map(([location, count]) => `
                             <div class="location-bar">
                                 <div class="location-name">
-                                    <span>${location}</span>
+                                    <span>${esc(location)}</span>
                                     <span>${count} ride${count !== 1 ? 's' : ''}</span>
                                 </div>
                                 <div class="progress-bar">
@@ -906,7 +1594,7 @@ const firebaseConfig = {
         };
 
         // Make functions globally available
-        window.renderCalendar = renderCalendar;
+        window.renderSlots = renderSlots;
         window.renderSessions = renderSessions;
         window.renderStats = renderStats;
     </script>

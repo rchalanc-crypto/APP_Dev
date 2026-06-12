@@ -7,10 +7,15 @@ Single-file HTML + vanilla JS + Firebase Realtime Database.
 
 **Fallback URL:** https://rchalanc-crypto.github.io/APP_Dev/apps/ride-tracker/
 
-**Status:** v1 live. Relocated from repo root to `apps/ride-tracker/` in the
+**Status:** v2 built 2026-06-12 per `SPEC-V2.md` — weather ensemble cards
+(Squamish Spit + Coquitlam), activity ranker with thermal-gradient signal,
+AM/PM/EVE availability slots, lazy second-opinion embeds (Windy/Windfinder)
+and SWS link-outs. Relocated from repo root to `apps/ride-tracker/` in the
 2026-06-12 Session 1 cutover (the bare domain now redirects to nassims-folly).
-v2 (weather ensemble, activity ranker, AM/PM/EVE availability) is specced in
-`SPEC-V2.md`.
+
+All tuning thresholds (kite/MTB wind bands, precip cap, thermal window,
+gradient points/bands, model spread bands) live in one constants block at the
+top of the `<script>` in `index.html`.
 
 ---
 
@@ -23,8 +28,15 @@ v2 (weather ensemble, activity ranker, AM/PM/EVE availability) is specced in
 
 ```
 /sessions/{pushId}            { type: mtb|kite, date, location, notes, user, timestamp }
-/availability/{date}/{user}   true (toggled; removed when off)
+/availability/{date}/{user}   { am: bool, pm: bool, eve: bool }  (removed when all off)
+                              legacy v1 boolean true = all-day; converts to the
+                              object shape on that user's first edit of that date
 ```
+
+Weather (Open-Meteo 4-model ensemble, thermal gradient) is fetched client-side,
+keyless, with a 2h localStorage cache — no backend. The fetch/ensemble logic is
+a copy of `shared/snippets/weather-ensemble.js`; bug fixes must be ported back
+to the snippet and to `apps/nassims-folly`.
 
 ## Database rules
 

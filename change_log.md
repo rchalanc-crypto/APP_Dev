@@ -6,6 +6,52 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-06-12] — ride-tracker v2: weather ensemble, activity ranker, AM/PM/EVE slots [COMPLETED]
+
+Per `apps/ride-tracker/SPEC-V2.md` (decisions locked 2026-06-12). Both prerequisite
+sessions (§0 shared-pattern extraction, Session 1 cutover) were already done.
+
+- **Weather tab (new)**: Coquitlam daily card (hi/lo, precip prob + mm, WMO icon,
+  today + 3) and Squamish Spit hourly wind card (4-model Open-Meteo ensemble
+  copied from `shared/snippets/weather-ensemble.js`, hour strip 8–20h with the
+  11–17h thermal window highlighted, per-day window median/gusts/confidence).
+  2h localStorage cache on every fetch with a visible "as of HH:MM (cached)" stamp.
+- **Activity ranker**: per-day KITE / MTB / EITHER / NEITHER call from the window
+  median + per-venue day precip (rain at the Spit kills KITE, rain on the trails
+  kills MTB, both wet = garage day — spec's single "day precip" interpreted
+  per-venue). Confidence from model spread; thermal upgrade to "KITE (thermal
+  likely)" on EITHER/marginal-KITE-miss days when the Pemberton−Vancouver 14:00
+  gradient is ≥ 8°C and the day is dry; static inflow caveat when the gradient
+  fetch fails on forecast-sunny days. All thresholds in one constants block.
+- **Second opinions**: collapsible `<details>` with Windy embed + Windfinder
+  `squamish_spit` widget — iframes injected only on first expand (first paint
+  unaffected) — and SWS link-out buttons (wind + webcam, new tab, no fetching or
+  hotlinking of SWS data per spec).
+- **Availability v2**: 14-day list × AM/PM/EVE chips per user; everyone's slots
+  visible per day; legacy boolean `true` renders all-day and converts to the
+  object shape on that user's first edit of that date (no migration). Date keys
+  now computed in local time (v1 used `toISOString()`, which flips to tomorrow's
+  date after ~5pm Pacific).
+- **Rules**: `availability/$date/$user` accepts boolean or `{am,pm,eve}` object,
+  `$other` keys rejected. Deployed from the repo file via
+  `firebase deploy --only database` (Node 22 via nvm — system Node 18 is too old
+  for firebase-tools 15). Live-tested: malformed and unknown-key writes rejected,
+  valid object + legacy boolean accepted. **Deliberate deviation from the spec's
+  rules block**: `.write` kept at the `$user` level (as in v1's repo rules) instead
+  of the spec's `".write": true` at the `availability` root — same app behaviour,
+  but a single client can't delete the whole availability tree. This deploy also
+  supersedes the drifted Console rules captured in "From Firebase.txt".
+- 14-day forward cap stays client-side (rules can't cheaply compare date keys to
+  now — accepted tradeoff per spec §3).
+- New user-visible content is now HTML-escaped (`esc()`), including the
+  previously-unescaped session notes/location/user fields.
+- Folly backport (§4): already done in the §0 prerequisite session — folly runs
+  the same snippet with trade-wind constants. No further work.
+- Verified: 25 live-API + 8 synthetic-path node tests (ranker decision table,
+  thermal upgrade/fallback, legacy normalization, cache hit). 375px and
+  second-browser passes remain manual — no browser in this environment.
+
+---
 ## [2026-06-12] — Session 1: housekeeping & guest-viewing cutover; ride-tracker outage post-mortem [COMPLETED]
 
 ### Outage post-mortem (ride-tracker)

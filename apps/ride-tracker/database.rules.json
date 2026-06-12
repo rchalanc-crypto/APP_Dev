@@ -21,7 +21,11 @@
       "$date": {
         "$user": {
           ".write": true,
-          ".validate": "newData.isBoolean()"
+          ".validate": "newData.isBoolean() || newData.hasChildren()",
+          "am":  { ".validate": "newData.isBoolean()" },
+          "pm":  { ".validate": "newData.isBoolean()" },
+          "eve": { ".validate": "newData.isBoolean()" },
+          "$other": { ".validate": false }
         }
       }
     }
