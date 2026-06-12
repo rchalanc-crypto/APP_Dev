@@ -3,6 +3,11 @@
 Master conventions for all apps in this repo. Per-app CLAUDE.md files in
 apps/<name>/ inherit from this file and record overrides only.
 
+### external tracker  - workflow management ###
+
+https://www.notion.so/616fd3226de94618bd03ab946ba8aa20?v=a9d355e4fa5e4d8ea85976e522babc5b
+
+
 ## Default stack
 
 Single-file HTML + vanilla JS + CSS variables + Firebase Realtime Database +
