@@ -6,6 +6,11 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-06-12] — folly polish hotfix: admin contrast + El Médano area card [COMPLETED]
+
+Admin screen light-on-light fixed (Phase 3.5 dark `body` color was inheriting onto pre-3.5 white admin surfaces — tables, bulk-add textarea, diary published-list; each now has an explicit dark token). Kite widget's three spot cards (all within ~2.5 km, one model grid cell, identical data) collapsed into a single "El Médano area" card listing the three launches — kite API calls cut from 3 to 1.
+
+---
 ## [2026-06-12] — shared weather-ensemble pattern + folly kite-widget upgrade [COMPLETED]
 
 ### Summary
