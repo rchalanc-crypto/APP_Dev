@@ -6,6 +6,24 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-06-12] — shared weather-ensemble pattern + folly kite-widget upgrade [COMPLETED]
+
+### Summary
+**[ARCHITECTURE] First shared snippet established: `shared/snippets/weather-ensemble.js` — Open-Meteo 4-model ensemble (GFS, ECMWF, ICON, GEM) fetch/cache/median/spread/confidence pattern, used by nassims-folly (kite widget) and the upcoming ride-tracker v2 (SPEC-V2-ridetracker.md §0–§2).** Reference copy, not a live module — both apps are single-file; logic is copied in, divergence lives only in each app's constants block.
+
+### Diagnosis that preceded it
+SPEC-V2 §0 suspected the folly Phase 4 widgets were "live but returning no data" (fetch/CORS). Verified 2026-06-12: **already fixed** — root cause was `wind_speed_unit=knots` (invalid; API wants `kn`) returning HTTP 400, fixed in commit 3e0ce43 (2026-05-08) and deployed. Open-Meteo CORS is open (`access-control-allow-origin: *`); all 8 folly spots' full data paths verified working via live-API probe. The spec's premise was stale.
+
+### nassims-folly changes
+- Kite widget (3 spots) now also fetches the 4-model ensemble: per-card line with kite-window (11–17h) median sustained + gusts, model-spread confidence band (`<5 kn` agree / `<10 kn` mostly agree / else disagree). Trade-wind regime — no thermal-gradient logic (that is ride-tracker-only).
+- Constants block `WX_ENS` at top of weather section (models, TTL, window hours, spread bands) per the one-pattern-two-apps convention.
+- All wx cards now show "as of HH:MM" (cache staleness visible, not silent) and render a visible "Weather unavailable" state on fetch failure instead of being stuck on "Loading…".
+- Ensemble failure is isolated per-card — it cannot take down the base card or anything else.
+
+### Deployment note (for Session 1 housekeeping cutover)
+follyintenerife.com **root** serves the legacy ride-tracker app from repo-root `index.html` (intentional continuity, see 2026-05-04 entry); the folly app lives at `/apps/nassims-folly/` and `LIVE_URL` is correct. Ride-tracker still needs its own `apps/ride-tracker/` folder — that move is the planned Session 1 cutover, not done here.
+
+---
 ## [2026-05-08] — nassims-folly Phase 4: Activities, Weather Widgets & Required Viewing [COMPLETED]
 
 ### Summary

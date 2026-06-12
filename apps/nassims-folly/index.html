@@ -960,6 +960,23 @@
       font-style: italic;
       margin-top: 10px;
     }
+
+    .wx-ensemble {
+      font-size: 11px;
+      color: var(--smoke);
+      margin-top: 8px;
+      padding-left: 8px;
+      border-left: 2px solid var(--iron);
+    }
+    .wx-ensemble.high     { border-left-color: var(--neon); }
+    .wx-ensemble.moderate { border-left-color: #C4A03E; }
+    .wx-ensemble.disagree { border-left-color: #8B2020; }
+
+    .wx-asof {
+      font-size: 10px;
+      color: var(--iron);
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -2576,13 +2593,28 @@
     }
 
     // ── §C — Shared weather fetch layer ──────────────────────────
+    // Ensemble pattern copied from shared/snippets/weather-ensemble.js
+    // (reference copy — keep logic in sync, tune only the constants).
+    // Tenerife is a trade-wind regime: spread-based confidence only,
+    // no thermal-gradient logic (that lives in ride-tracker).
 
     const WX_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours
+
+    const WX_ENS = {
+      MODELS: ['gfs_seamless', 'ecmwf_ifs025', 'icon_seamless', 'gem_seamless'],
+      CACHE_TTL_MS: WX_CACHE_TTL,
+      FORECAST_DAYS: 4,                 // today + 3
+      WINDOW_START_H: 11,               // kite window, local hours [start, end)
+      WINDOW_END_H: 17,
+      SPREAD_HIGH_KN: 5,                // spread < 5 kn  → models agree
+      SPREAD_MODERATE_KN: 10            // spread < 10 kn → mostly agree; else disagree
+    };
 
     async function fetchWeather(lat, lon) {
       const cacheKey = `wx_${lat}_${lon}`;
       const cached   = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if (cached && Date.now() - cached.ts < WX_CACHE_TTL) return cached.data;
+      if (cached && Date.now() - cached.ts < WX_CACHE_TTL)
+        return { ...cached.data, asOf: new Date(cached.ts) };
 
       const [wxRes, marineRes] = await Promise.all([
         fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
@@ -2600,7 +2632,85 @@
       const data   = { wx, marine };
 
       localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
-      return data;
+      return { ...data, asOf: new Date() };
+    }
+
+    async function fetchEnsembleWind(lat, lon, C = WX_ENS) {
+      const cacheKey = `wxens_${lat}_${lon}_${C.MODELS.join('-')}`;
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && Date.now() - cached.ts < C.CACHE_TTL_MS)
+        return { ...cached.data, asOf: new Date(cached.ts) };
+
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+        `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m` +
+        `&models=${C.MODELS.join(',')}` +
+        `&wind_speed_unit=kn&timezone=auto&forecast_days=${C.FORECAST_DAYS}`
+      );
+      if (!res.ok) throw new Error(`Ensemble API ${res.status} for ${lat},${lon}`);
+      const raw = await res.json();
+      if (!raw.hourly || !raw.hourly.time)
+        throw new Error(`Ensemble API bad payload: ${JSON.stringify(raw).slice(0,200)}`);
+
+      const models = {};
+      for (const m of C.MODELS) {
+        const speed = raw.hourly[`wind_speed_10m_${m}`];
+        if (!speed || !speed.some(v => v != null)) continue; // no coverage here
+        models[m] = {
+          speed,
+          gusts: raw.hourly[`wind_gusts_10m_${m}`] || [],
+          dir:   raw.hourly[`wind_direction_10m_${m}`] || []
+        };
+      }
+      const data = { hourly: { time: raw.hourly.time, models } };
+
+      localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+      return { ...data, asOf: new Date() };
+    }
+
+    function median(values) {
+      const v = values.filter(x => x != null).sort((a, b) => a - b);
+      if (!v.length) return null;
+      const mid = Math.floor(v.length / 2);
+      return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
+    }
+
+    // Per-model median of in-window hours, then median across models;
+    // spread = max − min of the per-model sustained medians.
+    function windowStats(ens, dayIndex, C = WX_ENS) {
+      const idx = [];
+      ens.hourly.time.forEach((t, i) => {
+        const h = parseInt(t.slice(11, 13), 10);
+        const d = Math.floor(i / 24); // 24 hourly rows per local day
+        if (d === dayIndex && h >= C.WINDOW_START_H && h < C.WINDOW_END_H) idx.push(i);
+      });
+      if (!idx.length) return null;
+
+      const perModelWind = [], perModelGust = [];
+      for (const m of Object.values(ens.hourly.models)) {
+        const w = median(idx.map(i => m.speed[i]));
+        const g = median(idx.map(i => m.gusts[i]));
+        if (w != null) perModelWind.push(w);
+        if (g != null) perModelGust.push(g);
+      }
+      if (!perModelWind.length) return null;
+
+      return {
+        medianWind: median(perModelWind),
+        medianGust: median(perModelGust),
+        spreadKn:   Math.max(...perModelWind) - Math.min(...perModelWind),
+        modelCount: perModelWind.length
+      };
+    }
+
+    function confidenceBand(spreadKn, C = WX_ENS) {
+      if (spreadKn < C.SPREAD_HIGH_KN)     return { band: 'high',     label: 'models agree' };
+      if (spreadKn < C.SPREAD_MODERATE_KN) return { band: 'moderate', label: 'models mostly agree' };
+      return { band: 'disagree', label: 'models disagree — low confidence' };
+    }
+
+    function fmtAsOf(d) {
+      return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
 
     function windBearing(deg) {
@@ -2640,7 +2750,7 @@
       for (let i = 0; i < KITE_SPOTS.length; i++) {
         const spot = KITE_SPOTS[i];
         try {
-          const { wx, marine } = await fetchWeather(spot.lat, spot.lon);
+          const { wx, marine, asOf } = await fetchWeather(spot.lat, spot.lon);
           const wind   = Math.round(wx.current.wind_speed_10m);
           const dir    = windBearing(wx.current.wind_direction_10m);
           const wave   = marine.current?.wave_height?.toFixed(1) ?? '—';
@@ -2657,6 +2767,25 @@
             </div>`;
           }).join('');
 
+          // 4-model ensemble for the kite window — its failure must not
+          // take down the card, so it gets its own try.
+          let ensLine = '';
+          try {
+            const ens   = await fetchEnsembleWind(spot.lat, spot.lon);
+            const stats = windowStats(ens, 0);
+            if (stats) {
+              const conf = confidenceBand(stats.spreadKn);
+              ensLine = `<div class="wx-ensemble ${conf.band}">
+                ${WX_ENS.WINDOW_START_H}–${WX_ENS.WINDOW_END_H}h window:
+                ${Math.round(stats.medianWind)} kt
+                (gusts ${Math.round(stats.medianGust)}) ·
+                ${conf.label}, ${stats.modelCount} models
+              </div>`;
+            }
+          } catch(e) {
+            console.error('Kite ensemble failed for', spot.name, e);
+          }
+
           document.getElementById(`kite_card_${i}`).innerHTML = `
             <div class="wx-score-bar ${score}"></div>
             <div class="wx-spot-name">${spot.name}</div>
@@ -2665,12 +2794,23 @@
               <div class="wx-stat-wind">${wind} kt ${dir}</div>
               <div>Wave: ${wave}m</div>
             </div>
+            ${ensLine}
             <div class="wx-forecast">${dayDots}</div>
+            <div class="wx-asof">as of ${fmtAsOf(asOf)}</div>
           `;
         } catch(e) {
           console.error('Kite wx failed for', spot.name, e);
+          wxCardError(`kite_card_${i}`, spot.name);
         }
       }
+    }
+
+    function wxCardError(cardId, spotName) {
+      const card = document.getElementById(cardId);
+      if (card) card.innerHTML = `
+        <div class="wx-spot-name">${spotName}</div>
+        <div style="color:var(--iron);font-size:12px;">Weather unavailable — try again later.</div>
+      `;
     }
 
     window.switchCondTab = function(type, btn) {
@@ -2711,7 +2851,7 @@
       for (let i = 0; i < PARA_SPOTS.length; i++) {
         const spot = PARA_SPOTS[i];
         try {
-          const { wx } = await fetchWeather(spot.lat, spot.lon);
+          const { wx, asOf } = await fetchWeather(spot.lat, spot.lon);
           const wind   = Math.round(wx.current.wind_speed_10m);
           const dir    = windBearing(wx.current.wind_direction_10m);
           const code   = wx.current.weather_code;
@@ -2737,9 +2877,11 @@
             </div>
             <div class="wx-forecast">${dayDots}</div>
             <div class="wx-note">${escapeHtml(spot.note)}</div>
+            <div class="wx-asof">as of ${fmtAsOf(asOf)}</div>
           `;
         } catch(e) {
           console.error('Para wx failed for', spot.name, e);
+          wxCardError(`para_card_${i}`, spot.name);
         }
       }
     }
@@ -2773,7 +2915,7 @@
       for (let i = 0; i < MOUST_SPOTS.length; i++) {
         const spot = MOUST_SPOTS[i];
         try {
-          const { wx } = await fetchWeather(spot.lat, spot.lon);
+          const { wx, asOf } = await fetchWeather(spot.lat, spot.lon);
           const wind   = Math.round(wx.current.wind_speed_10m);
           const dir    = windBearing(wx.current.wind_direction_10m);
           const precip = wx.daily.precipitation_sum[0] ?? 0;
@@ -2798,9 +2940,11 @@
             </div>
             <div class="wx-forecast">${dayDots}</div>
             <div class="wx-note">${escapeHtml(spot.note)}</div>
+            <div class="wx-asof">as of ${fmtAsOf(asOf)}</div>
           `;
         } catch(e) {
           console.error('Moust wx failed for', spot.name, e);
+          wxCardError(`moust_card_${i}`, spot.name);
         }
       }
     }
