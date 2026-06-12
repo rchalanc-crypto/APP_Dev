@@ -22,11 +22,24 @@ Handles RSVP, a voyage countdown, the Captain's Diary, and trip activities.
    (TXT for SPF + Firebase verification, 2× CNAME for DKIM). Requires Firebase Blaze plan.
    Note: the passwordless sign-in email body and sender display name are not customizable
    through Firebase Console — this is a Firebase platform limitation.
-4. Create a Realtime Database instance (test mode, tighten rules per `firebase-rules.json`).
+4. Create a Realtime Database instance (test mode, tighten rules per `firebase-rules.json` — deploy via CLI, see below).
 5. Replace `{{FIREBASE_API_KEY}}`, `{{FIREBASE_MESSAGING_SENDER_ID}}`, and `{{FIREBASE_APP_ID}}`
    in `index.html` with values from Firebase Console → Project settings.
 6. Seed the allowlist for both admins in the RTDB Console (see `CLAUDE.md` for details).
-7. Apply database rules from `firebase-rules.json` in the RTDB Console.
+7. Apply database rules from `firebase-rules.json` via CLI (see below).
+
+## Database rules
+
+Rules live in `firebase-rules.json` in this folder and deploy via CLI
+(`firebase.json` + `.firebaserc` pin project `wal-nassims-folly`):
+
+```bash
+cd apps/nassims-folly
+firebase deploy --only database
+```
+
+Console paste is for emergencies only and must be back-ported to
+`firebase-rules.json` the same day (root `CLAUDE.md` policy).
 
 ## Data model summary
 

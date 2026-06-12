@@ -32,6 +32,11 @@ complexity actually demands it. Name the justification in the app CLAUDE.md.
 - Firebase client config (apiKey etc.) is public by design — Firebase security
   rules are the actual data gate. Review rules before every live URL share.
 - Any user-write path in Firebase needs a payload size cap and shape validation.
+- Firebase rules changes are commits + CLI deploys (`cd apps/<name> &&
+  firebase deploy --only database`). Console paste is for emergencies only,
+  and must be back-ported to the repo rules file same-day. (Policy adopted
+  2026-06-12 after the ride-tracker test-mode-expiry outage — rules lived
+  only in the Console.)
 - Never paste real user data into any AI chat. Use synthetic data only.
 - Run the Skeptic-persona pass (security-checklist.md) before sharing any
   live URL beyond a closed group.

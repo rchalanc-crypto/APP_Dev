@@ -28,7 +28,7 @@ jobs:
           if [ -f index.html ]; then
             cp index.html _site/index.html
           else
-            echo '<meta http-equiv="refresh" content="0;url=apps/ride-tracker/">' > _site/index.html
+            echo '<meta http-equiv="refresh" content="0;url=apps/nassims-folly/">' > _site/index.html
           fi
 
       - uses: actions/upload-pages-artifact@v3

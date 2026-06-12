@@ -6,6 +6,52 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-06-12] — Session 1: housekeeping & guest-viewing cutover; ride-tracker outage post-mortem [COMPLETED]
+
+### Outage post-mortem (ride-tracker)
+
+Ride-tracker was dead from **May 31** (test-mode rules expired) until diagnosis on
+**2026-06-12**, when production rules were deployed via Console. Root causes:
+1. RTDB test-mode rules carry a 30-day expiry; nobody owned the renewal.
+2. The template rules used path `entries`; the live app writes `sessions` (+
+   `availability`) — so the on-hand replacement rules didn't match reality.
+3. Rules lived only in the Firebase Console — nothing in the repo to diff
+   against or redeploy from. This Console-paste drift is the structural cause.
+
+### The cutover
+
+- **Ride-tracker relocated**: root `index.html` (which WAS the live ride-tracker —
+  confirmed empirically, resolving the contradiction between the restructure-branch
+  plan and the Phase B deploy note) moved via `git mv` to `apps/ride-tracker/index.html`.
+  README created. SPEC-V2 now lives at `apps/ride-tracker/SPEC-V2.md` (duplicates at
+  repo root and `docs/` removed).
+- **Root redirect**: new root `index.html` is a meta-refresh + canonical redirect to
+  `apps/nassims-folly/` — guests typing the bare domain `follyintenerife.com/` now land
+  on the folly app. Pattern B workflow fallback redirect repointed from ride-tracker to
+  nassims-folly to match.
+- **Glenn's URL changes** to `https://follyintenerife.com/apps/ride-tracker/`
+  (github.io equivalent also works). Robert to notify Glenn.
+- **Folly unaffected**: app path, `LIVE_URL`, and authorized domains unchanged.
+
+### Rules-in-repo policy (new, in root CLAUDE.md)
+
+Rules changes are commits + CLI deploys: `cd apps/<name> && firebase deploy --only database`.
+Console paste is for emergencies only and must be back-ported to the repo file same-day.
+
+- `apps/ride-tracker/database.rules.json` created (sessions + availability,
+  shape-validated, default-deny). **Caveat:** the rules deployed via Console on
+  2026-06-12 were never captured in the repo; this file is reconstructed from the
+  app's actual write shapes — diff against Console state at first CLI deploy.
+- `apps/ride-tracker/firebase.json` + `.firebaserc` pin project `bigwhinybabyteartracker`.
+- `apps/nassims-folly/firebase.json` + `.firebaserc` pin project `wal-nassims-folly`,
+  pointing at the existing `firebase-rules.json`. Duplicate `firebase-rules-v2.json`
+  removed (byte-identical to `firebase-rules.json`). Repo copy vs Console: Phase 2
+  rules went via Console paste — Robert to diff manually before first CLI deploy.
+- Root README trimmed to the app index; the stale ride-tracker setup guide (which
+  recommended open test-mode rules — the exact failure mode above) dropped in favour
+  of `apps/ride-tracker/README.md`.
+
+---
 ## [2026-06-12] — folly polish hotfix: admin contrast + El Médano area card [COMPLETED]
 
 Admin screen light-on-light fixed (Phase 3.5 dark `body` color was inheriting onto pre-3.5 white admin surfaces — tables, bulk-add textarea, diary published-list; each now has an explicit dark token). Kite widget's three spot cards (all within ~2.5 km, one model grid cell, identical data) collapsed into a single "El Médano area" card listing the three launches — kite API calls cut from 3 to 1.
