@@ -6,6 +6,40 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-06-26] — ride-tracker: diary reconcile + editor edit-gate + silent-drop hotfix [COMPLETED]
+
+Per `apps/ride-tracker/SPEC-ridetracker-reconcile-hotfix.md` (gated session; spec authored on
+Claude.ai). Client changes + rules backport; rules were CLI-deployed in Step 1 and committed
+this pass so committed == live.
+
+- **Silent-drop root cause + fix**: long diary writes were rejected by the `sessions/$id`
+  `notes` length cap and lost silently because `push()` had no error handler. Cap raised
+  `1024 → 8192` in `database.rules.json` and CLI-deployed (Step 1); a `.then/.catch` now wraps
+  **both** the add and the new edit write and surfaces a visible orange error banner, so a
+  future rule rejection is loud, not swallowed. **Rules committed this pass to close
+  repo-vs-live drift** — committed repo previously read `1024` while live ran `8192` since Step 1.
+- **Editor edit capability + soft gate**: History cards are inline-editable (type/date/location/
+  notes) via `update` on the same `sessions/$id` key (never `push`). `EDITOR_HANDLE =
+  "J'Dinklage"` (lifted from the live `user` bytes — ASCII apostrophe, not transcribed). Edit
+  shows iff `currentUser === EDITOR_HANDLE && session.user === EDITOR_HANDLE`; **delete logic
+  unchanged** (`session.user === currentUser`). Edit + log textareas both `maxlength=8192`.
+- **Diary reconciled**: 9 MTB (1 Squamish dated 2026-06-24 / 8 Eagle Mountain) + 3 kite. Three
+  corrupted records corrected in place (dates → ISO, locations → bare dropdown strings, the one
+  `$3.3\text{ kph}$` LaTeX literal stripped to `3.3 kph`); surplus second Squamish MTB
+  ("Mad Hatter / Rupert") deleted. History sort changed from timestamp to **ride-date
+  descending** (timestamp tiebreaker).
+- **SPEC assumption A2 overridden by live app data**: the real kite sessions are 6/11 + 6/14 +
+  6/16 (entered by Robert through the app mid-session — incl. a 1262-char entry, proving the cap
+  fix end-to-end). The spec's "6/22 maps to 14-Jun" mapping and the 16-Jun "no chronicle" stub
+  were dropped; the spec-version kite entries were deleted in favour of Robert's three.
+- **KNOWN PENDING**: one Eagle Mountain MTB ride is still to be manually logged by Robert (true
+  season = 9 Eagle). Until then the count reads **8 Eagle — expected, not a bug**.
+- **OUT OF SCOPE / follow-on**: 4 pre-existing `J'Dinkalage Morgoone` (curly-apostrophe,
+  misspelled) MTB entries left untouched — user-normalization cleanup is a separate session.
+  Consider dropping "Other" from the location dropdown to prevent city-name drift
+  (Coquitlam / Port Moody had crept into `location`).
+
+---
 ## [2026-06-12] — ride-tracker v2: weather ensemble, activity ranker, AM/PM/EVE slots [COMPLETED]
 
 Per `apps/ride-tracker/SPEC-V2.md` (decisions locked 2026-06-12). Both prerequisite

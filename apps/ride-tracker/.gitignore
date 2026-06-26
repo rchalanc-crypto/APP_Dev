@@ -1,0 +1,2 @@
+# Live diary data backups — never commit (contains real user content)
+sessions-backup*.json

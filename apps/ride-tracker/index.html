@@ -627,6 +627,12 @@
             font-style: italic;
         }
 
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
         .delete-btn {
             background: var(--orange);
             color: white;
@@ -635,7 +641,16 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
-            margin-top: 10px;
+        }
+
+        .edit-btn {
+            background: var(--ocean);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
 
         /* Stats */
@@ -863,7 +878,7 @@
                         </div>
                         <div class="form-group">
                             <label for="notes">Notes (optional)</label>
-                            <textarea id="notes" rows="3" placeholder="Trail conditions, weather, highlights..."></textarea>
+                            <textarea id="notes" rows="3" maxlength="8192" placeholder="Trail conditions, weather, highlights..."></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Log Session</button>
                     </form>
@@ -1329,6 +1344,11 @@ const firebaseConfig = {
             });
         });
 
+        // Diary editor handle. Value lifted verbatim from the live `user` bytes on
+        // the chronicle entries (ASCII apostrophe — confirmed against stored data,
+        // not transcribed from the spec). The Edit gate is strict ===.
+        const EDITOR_HANDLE = "J'Dinklage";
+
         let currentUser = null;
 
         // Login
@@ -1388,7 +1408,12 @@ const firebaseConfig = {
                 const sessions = Object.entries(data).map(([id, session]) => ({
                     id,
                     ...session
-                })).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                })).sort((a, b) => {
+                    // Diary order is by ride date (desc); timestamp only breaks ties
+                    // so back-filled entries land by when they happened, not when logged.
+                    const byDate = new Date(b.date) - new Date(a.date);
+                    return byDate !== 0 ? byDate : new Date(b.timestamp) - new Date(a.timestamp);
+                });
                 
                 renderSessions(sessions);
                 renderStats(sessions);
@@ -1490,7 +1515,8 @@ const firebaseConfig = {
             };
 
             const sessionsRef = ref(db, 'sessions');
-            push(sessionsRef, session);
+            push(sessionsRef, session).catch(err =>
+                showWriteError('Could not log session: ' + (err && err.message ? err.message : err)));
 
             e.target.reset();
             document.getElementById('sessionDate').valueAsDate = new Date();
@@ -1499,8 +1525,33 @@ const firebaseConfig = {
             switchTab('history');
         });
 
+        // Make Firebase write failures loud. RTDB validation rejections (over-cap
+        // or malformed writes) otherwise fail silently — that invisibility, not the
+        // cap itself, was the real defect behind the dropped diary entries.
+        function showWriteError(msg) {
+            let el = document.getElementById('writeError');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'writeError';
+                el.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);' +
+                    'background:var(--orange);color:#fff;padding:12px 20px;border-radius:8px;' +
+                    'box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:1000;font-weight:600;max-width:90vw;text-align:center;';
+                document.body.appendChild(el);
+            }
+            el.textContent = '⚠️ ' + msg;
+            el.style.display = 'block';
+            clearTimeout(el._timer);
+            el._timer = setTimeout(() => { el.style.display = 'none'; }, 6000);
+        }
+
+        // History cards. Only the editor (strict === on the handle lifted from the
+        // live data) sees Edit, and only on editor-authored entries.
+        let allSessions = [];
+        let editingId = null;
+
         // Render sessions
         function renderSessions(sessions) {
+            allSessions = sessions;
             const list = document.getElementById('sessionsList');
             
             if (sessions.length === 0) {
@@ -1508,7 +1559,14 @@ const firebaseConfig = {
                 return;
             }
 
-            list.innerHTML = sessions.map(session => `
+            list.innerHTML = sessions.map(session =>
+                session.id === editingId ? editCardHtml(session) : displayCardHtml(session)
+            ).join('');
+        }
+
+        function displayCardHtml(session) {
+            const canEdit = currentUser === EDITOR_HANDLE && session.user === EDITOR_HANDLE;
+            return `
                 <div class="session-card ${session.type === 'kite' ? 'kite' : ''}">
                     <div class="session-header">
                         <div class="session-type">${session.type === 'mtb' ? '🚵 MTB Ride' : '🪁 Kite Session'}</div>
@@ -1519,10 +1577,58 @@ const firebaseConfig = {
                     </div>
                     <div class="session-location">📍 ${esc(session.location)}</div>
                     ${session.notes ? `<div class="session-notes">${esc(session.notes)}</div>` : ''}
-                    ${session.user === currentUser ? `<button class="delete-btn" onclick="deleteSession('${session.id}')">Delete</button>` : ''}
-                </div>
-            `).join('');
+                    <div class="card-actions">
+                        ${canEdit ? `<button class="edit-btn" onclick="startEdit('${session.id}')">Edit</button>` : ''}
+                        ${session.user === currentUser ? `<button class="delete-btn" onclick="deleteSession('${session.id}')">Delete</button>` : ''}
+                    </div>
+                </div>`;
         }
+
+        // Inline editor. Values are single-escaped via esc(); the display path also
+        // escapes, but this is a separate render — do NOT double-escape.
+        function editCardHtml(session) {
+            return `
+                <div class="session-card ${session.type === 'kite' ? 'kite' : ''} editing">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="edit-type">
+                            <option value="mtb" ${session.type === 'mtb' ? 'selected' : ''}>🚵 Mountain Bike</option>
+                            <option value="kite" ${session.type === 'kite' ? 'selected' : ''}>🪁 Kite Surf</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="edit-date" value="${esc(session.date)}">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="edit-location" value="${esc(session.location)}" maxlength="128">
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="edit-notes" rows="6" maxlength="8192">${esc(session.notes || '')}</textarea>
+                    </div>
+                    <div class="card-actions">
+                        <button class="edit-btn" onclick="saveEdit('${session.id}')">Save</button>
+                        <button class="delete-btn" onclick="cancelEdit()" style="background:var(--moss);">Cancel</button>
+                    </div>
+                </div>`;
+        }
+
+        window.startEdit = function(id) { editingId = id; renderSessions(allSessions); };
+        window.cancelEdit = function() { editingId = null; renderSessions(allSessions); };
+        window.saveEdit = function(id) {
+            const type = document.getElementById('edit-type').value;
+            const date = document.getElementById('edit-date').value;
+            const location = document.getElementById('edit-location').value.trim();
+            const notes = document.getElementById('edit-notes').value;
+            if (!date || !location) { showWriteError('Date and location are required.'); return; }
+            // update (not push) writes back to the same key; user + timestamp are
+            // left untouched so authorship and sort order are preserved.
+            update(ref(db, `sessions/${id}`), { type, date, location, notes })
+                .then(() => { editingId = null; renderSessions(allSessions); })
+                .catch(err => showWriteError('Could not save edit: ' + (err && err.message ? err.message : err)));
+        };
 
         // Delete session
         window.deleteSession = function(id) {
