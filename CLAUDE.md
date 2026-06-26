@@ -24,6 +24,10 @@ complexity actually demands it. Name the justification in the app CLAUDE.md.
 - docs/tooling-decisions.md — append an entry after every meaningful session.
 - change_log.md — append structural/architectural decisions; commit-level
   details belong in git messages.
+- apps/<name>/CHANGELOG.md — app-level history (features, bugfixes, app-scoped
+  decisions). Routing test for any entry: would a session working on a DIFFERENT app
+  need to read it? Yes → root change_log.md (program-structural only); No → that app's
+  CHANGELOG. Trivial, no-narrative changes still belong in git commit messages.
 
 ## Security non-negotiables
 

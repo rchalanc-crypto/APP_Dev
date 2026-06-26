@@ -1,8 +1,11 @@
 # WEB APPS LAB — CHANGE LOG
 
-> Audit trail for all structural, architectural, and deployment changes across the program.
-> App-level bugs and minor edits belong in commit messages; decisions that affect the whole
-> program structure or that a future session needs to understand belong here.
+> Audit trail for PROGRAM-STRUCTURAL changes only: repo restructures, Pages-pattern changes,
+> rules-in-repo policy, shared-snippet/architecture decisions, and cross-app decisions.
+> App-level history (features, bugfixes, app-scoped decisions) now lives in
+> apps/<name>/CHANGELOG.md. Routing test: would a session working on a DIFFERENT app need the
+> entry? Yes → here. No → that app's CHANGELOG. Trivial, no-narrative changes belong in commit
+> messages. Existing entries below predate this split and are left intact.
 > Entries ordered newest-first (reverse chronological).
 
 ---
