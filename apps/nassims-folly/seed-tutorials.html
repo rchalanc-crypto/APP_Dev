@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nassim's Folly — Tutorial Seed</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: monospace; background: #1a1a2e; color: #e0e0e0; padding: 32px; line-height: 1.6; }
+    h1 { color: #4a90b8; margin-bottom: 8px; }
+    p  { color: #aaa; margin-bottom: 16px; font-size: 0.9rem; }
+    .warn { color: #f59e0b; background: #1a1a00; border: 1px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; }
+    button {
+      background: #2b6b8a; color: white; border: none; padding: 12px 28px;
+      border-radius: 6px; font-size: 1rem; cursor: pointer; margin-right: 12px;
+    }
+    button:hover { background: #1a3a5c; }
+    button:disabled { opacity: 0.4; cursor: default; }
+    #log { margin-top: 24px; background: #111; border-radius: 6px; padding: 16px; font-size: 0.85rem; min-height: 80px; }
+    .ok  { color: #4ade80; }
+    .err { color: #f87171; }
+    .inf { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <h1>Nassim's Folly — Tutorial Seed</h1>
+  <p>One-time seed: attach a <code>tutorial</code> to two activities (matched by title).
+     Carries the Required-Viewing captions verbatim.</p>
+  <p id="authStatus" style="color:#f59e0b;">Checking sign-in…</p>
+  <p id="originDiag" style="color:#64748b; font-size:0.8rem; margin-top:-8px;"></p>
+
+  <div class="warn" id="warnOnce">
+    Idempotent — safe to re-run. Matches each target by its exact <code>title</code> and
+    <strong>update()</strong>s only the <code>tutorial</code> child; nothing else on the record
+    is touched. No status, no rules. Activities are not status-gated, so this is
+    <strong>live to guests</strong> the moment it writes.
+  </div>
+
+  <button id="seedBtn" disabled onclick="runSeed()">Seed Tutorials</button>
+  <div id="log"></div>
+
+  <script type="module">
+    import { initializeApp }
+      from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import {
+      getAuth, onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, get, update }
+      from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey:            'AIzaSyBTa08k41HZeCO1OdIByPEWc8wCwKAzEcQ',
+      authDomain:        'wal-nassims-folly.firebaseapp.com',
+      databaseURL:       'https://wal-nassims-folly-default-rtdb.firebaseio.com',
+      projectId:         'wal-nassims-folly',
+      storageBucket:     'wal-nassims-folly.firebasestorage.app',
+      messagingSenderId: '224165103778',
+      appId:             '1:224165103778:web:561f1fe488cdbe7815effb'
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    function log(msg, cls = 'inf') {
+      document.getElementById('log').innerHTML += `<div class="${cls}">${msg}</div>`;
+    }
+
+    document.getElementById('originDiag').textContent =
+      `This page: ${location.origin}${location.pathname}`;
+
+    onAuthStateChanged(auth, async user => {
+      const statusEl = document.getElementById('authStatus');
+      const btn      = document.getElementById('seedBtn');
+      if (!user) {
+        statusEl.style.color = '#f87171';
+        statusEl.innerHTML =
+          'Not signed in on this origin. Sign into the app at ' +
+          '<a href="https://follyintenerife.com/apps/nassims-folly/" style="color:#4a90b8;">' +
+          'follyintenerife.com/apps/nassims-folly/</a> in this same browser, then reopen this page.';
+        btn.disabled = true;
+        return;
+      }
+      const adminSnap = await get(ref(db, `admin/${user.uid}`)).catch(() => null);
+      if (!adminSnap || !adminSnap.exists()) {
+        statusEl.style.color = '#f59e0b';
+        statusEl.textContent = `Signed in as ${user.email} — but you are not an admin. Cannot seed.`;
+        btn.disabled = true;
+        return;
+      }
+      statusEl.style.color = '#4ade80';
+      statusEl.textContent = `Signed in as ${user.email} — admin. Ready to seed.`;
+      btn.disabled = false;
+    });
+
+    // ── Tutorials to attach (matched by activity title) ─────────────
+    // Captions carried VERBATIM from the retired Required Viewing block.
+    const TUTORIALS = [
+      {
+        match_title: 'El Médano',
+        tutorial: {
+          youtube_id:  '5ybJz0oByhA',
+          title:       '2016 Capetown — Steven Akkersdijk',
+          jdm_caption: 'The Chronicler has reviewed the literature on kite mastery. This is the literature.',
+          keeper_note: 'Wind: 35+ knots. The Chronicler has been advised not to attempt this.'
+        }
+      },
+      {
+        match_title: 'Subida al Boquerón',
+        tutorial: {
+          youtube_id:  'm_KBvP0_8Tc',
+          title:       "Ken Block's GYMKHANA TEN: The Ultimate Tire Slaying Tour",
+          jdm_caption: 'The Chronicler has reviewed the literature on hill driving. This is also the literature.',
+          keeper_note: "The verge incident has been omitted from the Chronicler's account. I have not omitted it."
+        }
+      }
+    ];
+
+    window.runSeed = async function() {
+      const btn = document.getElementById('seedBtn');
+      btn.disabled = true;
+      btn.textContent = 'Seeding…';
+      document.getElementById('log').innerHTML = '';
+
+      try {
+        const snap = await get(ref(db, 'content/activities'));
+        if (!snap.exists()) { log('✗ /content/activities is empty — nothing to match.', 'err'); btn.disabled = false; btn.textContent = 'Seed Tutorials'; return; }
+
+        // Build title → [keys] map to detect the target(s) and any dupes.
+        const byTitle = {};
+        snap.forEach(child => {
+          const t = (child.val() && child.val().title) || '';
+          (byTitle[t] = byTitle[t] || []).push(child.key);
+        });
+
+        for (const { match_title, tutorial } of TUTORIALS) {
+          const keys = byTitle[match_title] || [];
+          if (keys.length === 0) {
+            log(`✗ No activity titled "${match_title}" — skipped.`, 'err');
+            continue;
+          }
+          if (keys.length > 1) {
+            log(`⚠ ${keys.length} activities titled "${match_title}" — writing to all of them.`, 'err');
+          }
+          for (const key of keys) {
+            // Touch ONLY the tutorial child; leaves title/category/order/etc intact.
+            await update(ref(db, `content/activities/${key}`), { tutorial });
+            log(`✓ "${match_title}" [${key}] ← tutorial ${tutorial.youtube_id}`, 'ok');
+          }
+        }
+
+        log('Done. Open the app → What to Do; the two cards show a Tutorial ▶ link.', 'ok');
+        btn.textContent = 'Seed Complete';
+      } catch (err) {
+        log('Error: ' + err.message, 'err');
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = 'Seed Tutorials';
+      }
+    };
+  </script>
+</body>
+</html>

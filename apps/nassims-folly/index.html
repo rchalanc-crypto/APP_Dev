@@ -715,56 +715,42 @@
       animation: darkReveal 0.8s ease-out forwards;
     }
 
-    /* ── §A — Video grid ─────────────────────────────────────────── */
-    .video-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
+    /* ── Activity tutorial (ex-Required Viewing) ─────────────────────
+       Shown on a card only when the activity has a `tutorial`. Reuses the
+       diary/keeper look; contrast verified on --charcoal card bg: neon link
+       11.65:1, parchment jdm 11.99:1 (AAA), smoke keeper 5.55:1 (AA). */
+    .activity-tutorial {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 0.5px solid var(--iron);
     }
-
-    @media (min-width: 768px) {
-      .video-grid { grid-template-columns: repeat(3, 1fr); }
+    .activity-tutorial-link {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--neon);
+      text-decoration: none;
+      margin-bottom: 8px;
     }
-
-    .video-card {
-      background: var(--charcoal);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .video-embed {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-    }
-
-    .video-embed iframe {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: none;
-    }
-
-    .video-caption { padding: 14px 16px; }
-
-    .video-caption-jdm {
+    .activity-tutorial-link:hover,
+    .activity-tutorial-link:focus-visible { text-decoration: underline; }
+    .activity-tutorial-jdm {
       font-family: var(--font-diary);
       font-style: italic;
-      font-size: 14px;
+      font-size: 15px;
       color: var(--parchment);
       line-height: 1.6;
       margin-bottom: 8px;
     }
-
-    .video-caption-keeper {
+    .activity-tutorial-keeper {
       font-size: 12px;
       color: var(--smoke);
-      border-top: 0.5px solid var(--iron);
-      padding-top: 8px;
-      margin-top: 8px;
+      line-height: 1.6;
     }
-
-    .video-caption-keeper::before {
+    .activity-tutorial-keeper::before {
       content: "— Keeper: ";
       color: var(--neon);
       font-weight: 500;
@@ -1185,10 +1171,6 @@
         <i class="ti ti-clock" aria-hidden="true"></i>
         <span>Days</span>
       </a>
-      <a class="nav-item" href="#watch"      data-section="watch">
-        <i class="ti ti-player-play" aria-hidden="true"></i>
-        <span>Watch</span>
-      </a>
       <a class="nav-item" href="#briefs"     data-section="briefs" id="briefsNavItem">
         <span class="nav-icon-wrap">
           <i class="ti ti-speakerphone" aria-hidden="true"></i>
@@ -1257,14 +1239,6 @@
         <div id="briefsFeed">
           <p style="color: var(--iron); font-size: 14px;">No briefs yet. Watch this space.</p>
         </div>
-      </section>
-
-      <section id="watch" class="page-section">
-        <div class="section-label">Required Viewing</div>
-        <p style="color:var(--smoke); font-size:13px; margin-bottom:24px; letter-spacing:1px; text-transform:uppercase;">
-          Pre-flight briefing materials. Watch before arrival.
-        </p>
-        <div class="video-grid" id="videoGrid"></div>
       </section>
 
       <section class="page-section" id="diary">
@@ -1783,6 +1757,17 @@
         const borderColor = isUnread ? 'var(--terracotta)' : 'var(--iron)';
         const date        = new Date(brief.created_at).toLocaleDateString(
                               'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        // Attribution — render ONCE. The author FIELD (compose dropdown) is
+        // always set, but some briefs also hand-type a sign-off at the end of
+        // the body (e.g. Robert's "Human Mule / IT Support" flourish). Suppress
+        // the field line when the body already ends with a sign-off; and never
+        // emit a bare "— " when the author is legitimately empty.
+        const authorClean = (brief.author || '').trim();
+        const lines       = (brief.body || '').split('\n').map(l => l.trim()).filter(Boolean);
+        const lastLine    = lines.length ? lines[lines.length - 1] : '';
+        const bodyHasSignoff = /^[—–-]/.test(lastLine) ||
+                               (authorClean.length > 0 && lastLine.includes(authorClean));
+        const showAttribution = authorClean.length > 0 && !bodyHasSignoff;
         return `
           <div class="brief-card card" style="border-left: 3px solid ${borderColor}; margin-bottom: 12px;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -1800,7 +1785,7 @@
             <div style="color:var(--smoke); line-height:1.7;">
               ${renderMarkdown(brief.body)}
             </div>
-            <div style="font-size:12px; color:var(--iron); margin-top:10px;">— ${escapeHtml(brief.author)}</div>
+            ${showAttribution ? `<div style="font-size:12px; color:var(--iron); margin-top:10px;">— ${escapeHtml(authorClean)}</div>` : ''}
           </div>
         `;
       }).join('');
@@ -1839,7 +1824,6 @@
         briefsListenerActive = true;
         initBriefsFeed();
       }
-      renderRequiredViewing();
       if (!activitiesActive) {
         activitiesActive = true;
         initActivities();
@@ -2571,46 +2555,6 @@
       }
     });
 
-    // ── §A — Required Viewing ─────────────────────────────────────
-
-    const VIDEOS = [
-      {
-        id:     '5ybJz0oByhA',
-        jdm:    "The Chronicler has reviewed the literature on kite mastery. This is the literature.",
-        keeper: "Wind: 35+ knots. The Chronicler has been advised not to attempt this."
-      },
-      {
-        id:     'm_KBvP0_8Tc',
-        jdm:    "The Chronicler has reviewed the literature on hill driving. This is also the literature.",
-        keeper: "The verge incident has been omitted from the Chronicler's account. I have not omitted it."
-      },
-      {
-        id:     'LXzPkkQirnM',
-        jdm:    "A second opinion was sought on driving. The Keeper watched this one twice.",
-        keeper: "Technique."
-      }
-    ];
-
-    function renderRequiredViewing() {
-      document.getElementById('videoGrid').innerHTML = VIDEOS.map(v => `
-        <div class="video-card">
-          <div class="video-embed">
-            <iframe
-              src="https://www.youtube.com/embed/${v.id}"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-              loading="lazy"
-              title="Required viewing">
-            </iframe>
-          </div>
-          <div class="video-caption">
-            <div class="video-caption-jdm">"${v.jdm}"</div>
-            <div class="video-caption-keeper">${v.keeper}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
     // ── §B — Activities ───────────────────────────────────────────
 
     const CATEGORIES = {
@@ -2678,6 +2622,15 @@
             <div class="activity-card-title">${escapeHtml(a.title)}</div>
             <div class="activity-card-desc">${escapeHtml(cleanDesc)}</div>
             ${verifyNote ? `<div class="activity-card-verify">⚠ ${escapeHtml(verifyNote)}</div>` : ''}
+            ${a.tutorial ? `
+            <div class="activity-tutorial">
+              <a class="activity-tutorial-link"
+                 href="https://www.youtube.com/watch?v=${escapeHtml(a.tutorial.youtube_id)}"
+                 target="_blank" rel="noopener"
+                 title="${escapeHtml(a.tutorial.title || '')}">Tutorial ▶</a>
+              <div class="activity-tutorial-jdm">"${escapeHtml(a.tutorial.jdm_caption || '')}"</div>
+              ${a.tutorial.keeper_note ? `<div class="activity-tutorial-keeper">${escapeHtml(a.tutorial.keeper_note)}</div>` : ''}
+            </div>` : ''}
           </div>
         `;
       }).join('');
