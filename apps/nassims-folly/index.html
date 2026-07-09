@@ -573,7 +573,7 @@
     .diary-author { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 1px; color: var(--neon); }
     .diary-date   { font-size: 0.85rem; color: var(--smoke); font-style: italic; }
     .diary-title  { font-family: var(--font-display); font-size: 1.6rem; color: var(--parchment); margin-bottom: 16px; letter-spacing: 0.5px; }
-    .diary-body   { font-family: var(--font-diary); }
+    .diary-body   { font-family: var(--font-diary); font-size: 18px; }
     .diary-body p { margin-bottom: 16px; color: var(--parchment); }
     .diary-image  { width: 100%; border-radius: 6px; margin-top: 16px; }
 
@@ -990,6 +990,40 @@
     #briefsFeed .brief-card p:last-child,
     .prose-col p:last-child { margin-bottom: 0; }
 
+    /* ── Crew (evergreen "who are these two people") ──────────────────
+       Leans on the diary card + blockquote look; prose-col caps width. */
+    #crew .crew-intro {
+      font-family: var(--font-diary); font-style: italic;
+      font-size: 18px; color: var(--smoke); margin-bottom: 22px;
+    }
+    #crew .crew-notice p {
+      font-family: var(--font-body); font-size: 16.5px;
+      line-height: 1.6; color: var(--parchment); margin-bottom: 16px;
+    }
+    #crew .crew-name {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.25rem; letter-spacing: 0.5px; color: var(--neon);
+      margin: 28px 0 12px;
+    }
+    #crew blockquote {
+      font-family: var(--font-diary); font-style: italic;
+      font-size: 18px; line-height: 1.6; color: var(--parchment);
+      border-left: 3px solid var(--terracotta);
+      padding: 4px 0 4px 20px; margin: 16px 0;
+    }
+    #crew blockquote .crew-attr {
+      display: block; font-family: var(--font-body); font-style: normal;
+      font-size: 14px; color: var(--smoke); margin-top: 10px;
+    }
+    #crew .crew-outro {
+      font-family: var(--font-body); font-style: italic;
+      font-size: 15px; color: var(--smoke); margin-top: 26px;
+    }
+    #crew .crew-byline {
+      font-family: var(--font-body); font-style: italic;
+      font-size: 15px; color: var(--smoke); margin-top: 14px;
+    }
+
     /* ── A: Property gallery lightbox ─────────────────────────────── */
     .lightbox {
       position: fixed;
@@ -1241,6 +1275,33 @@
         </div>
         <div id="briefsFeed">
           <p style="color: var(--iron); font-size: 14px;">No briefs yet. Watch this space.</p>
+        </div>
+      </section>
+
+      <section id="crew" class="page-section">
+        <div class="section-label">The Crew</div>
+        <div class="diary-entry prose-col">
+          <div class="diary-title">The Crew (An Explanation, of Sorts)</div>
+          <div class="crew-intro">A notice from the Management regarding personnel.</div>
+
+          <div class="crew-notice">
+            <p>Several of you have now asked a reasonable question: who are these two people filing reports, and why. The Management wishes to be transparent.</p>
+            <p>The Management did not set out to hire anyone. An advertisement was placed on Facebook Marketplace, under "Miscellaneous," seeking assistance of an unspecified nature. Two applicants responded. They responded <em>together.</em> They presented remarkably well. It was made clear, by means the Management still cannot fully reconstruct, that they came as a set and that declining one meant declining both. Legal counsel was not consulted at the time, a fact counsel has since raised on several occasions.</p>
+            <p>They have been with the expedition ever since. The Management assumes no responsibility for their reports, their methods, or their titles — most of which are self-issued.</p>
+
+            <div class="crew-name">J'Dinklage Morgoone — Chronicler to the Expedition</div>
+            <p>Engaged to keep the record. Does so at considerable length. Introduces himself to strangers, hotel staff, and at least one visibly uncertain customs official as "the Captain" — a rank he does not hold and was not offered. The Management has elected not to correct this, on the grounds that correcting it would change nothing.</p>
+            <p>Considers himself a natural athlete. Plays golf. Plays pickleball. The evidence supporting the "natural athlete" designation has not been located, though J'Dinklage Morgoone maintains it exists and is merely between filings. In his own account:</p>
+            <blockquote>"The course received me with the deference one expects. My score is not relevant to this account."<span class="crew-attr">— the Captain</span></blockquote>
+
+            <div class="crew-name">Gnatalee McCringleberry — Keeper of the Sanity</div>
+            <p>The G is silent. The role is self-appointed; the Management was not consulted and, on reflection, would have agreed to it anyway. In every report she files, she refers to J'Dinklage Morgoone as "the Captain." She has never explained why. The Management has stopped asking.</p>
+            <p>Her competencies — kitesurfing, rally driving, mountain biking — are real and pursued without commentary. She has never played golf or pickleball. She has beaten the Captain at both, on the first attempt, and recorded the scores he declined to mention. She does not gloat. She counts. In her own words:</p>
+            <blockquote>"The Captain reports we built fortifications. We stacked three rocks. The rocks are not load-bearing."<span class="crew-attr">— Gnatalee McCringleberry, Keeper of the Sanity</span></blockquote>
+
+            <p class="crew-outro"><em>The Management endorses neither of them, and both of them, and accepts that this is now the arrangement. Their reports are, regrettably, canon.</em></p>
+            <p class="crew-byline">— Robert (Human Mule)</p>
+          </div>
         </div>
       </section>
 
