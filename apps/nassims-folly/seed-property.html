@@ -26,7 +26,8 @@
 
   <h1>Nassim's Folly — Property Seed</h1>
   <p>One-time seed: Casa Estrella facts, hero, caption, permission, and 32 gallery photos to <code>/content/property</code>.</p>
-  <p id="authStatus" style="color:#f59e0b;">Checking auth…</p>
+  <p id="authStatus" style="color:#f59e0b;">Checking sign-in…</p>
+  <p id="originDiag" style="color:#64748b; font-size:0.8rem; margin-top:-8px;"></p>
 
   <div class="warn" id="warnOnce">
     This writes property content via <strong>update()</strong> — idempotent, safe to re-run.
@@ -66,21 +67,43 @@
       el.innerHTML += `<div class="${cls}">${msg}</div>`;
     }
 
+    // Surface the exact origin — Firebase persists the signed-in session per
+    // origin, so this page only sees your session if you signed into the app
+    // on THIS same origin. A mismatch here is the usual "not signed in" cause.
+    document.getElementById('originDiag').textContent =
+      `This page: ${location.origin}${location.pathname}`;
+
+    // Sole sign-in gate. Never read auth.currentUser synchronously — it is
+    // null until Firebase finishes restoring the persisted session, so all
+    // signed-in / admin / enable-button logic lives inside this callback and
+    // runs only after it resolves.
+    //
+    // Persistence: we keep Firebase's DEFAULT (indexedDB-local, exactly what
+    // index.html uses). Do NOT force browserLocalPersistence — that reads
+    // localStorage and would miss the app's IndexedDB session, reproducing the
+    // very "not signed in" bug.
     onAuthStateChanged(auth, async user => {
+      const statusEl = document.getElementById('authStatus');
+      const btn      = document.getElementById('seedBtn');
       if (!user) {
-        document.getElementById('authStatus').textContent =
-          'Not signed in. Sign in via the main app first, then return here.';
+        statusEl.style.color = '#f87171';
+        statusEl.innerHTML =
+          'Not signed in on this origin. Sign into the app at ' +
+          '<a href="https://follyintenerife.com/apps/nassims-folly/" style="color:#4a90b8;">' +
+          'follyintenerife.com/apps/nassims-folly/</a> in this same browser, then reopen this page.';
+        btn.disabled = true;
         return;
       }
       const adminSnap = await get(ref(db, `admin/${user.uid}`)).catch(() => null);
       if (!adminSnap || !adminSnap.exists()) {
-        document.getElementById('authStatus').textContent =
-          `Signed in as ${user.email} — but you are not an admin. Cannot seed.`;
+        statusEl.style.color = '#f59e0b';
+        statusEl.textContent = `Signed in as ${user.email} — but you are not an admin. Cannot seed.`;
+        btn.disabled = true;
         return;
       }
-      document.getElementById('authStatus').textContent =
-        `Signed in as ${user.email} (admin). Ready to seed.`;
-      document.getElementById('seedBtn').disabled = false;
+      statusEl.style.color = '#4ade80';
+      statusEl.textContent = `Signed in as ${user.email} — admin. Ready to seed.`;
+      btn.disabled = false;
     });
 
     // ── Gallery photos (32) ─────────────────────────────────────────
