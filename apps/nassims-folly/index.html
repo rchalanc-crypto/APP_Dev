@@ -717,8 +717,9 @@
 
     /* ── Activity tutorial (ex-Required Viewing) ─────────────────────
        Shown on a card only when the activity has a `tutorial`. Reuses the
-       diary/keeper look; contrast verified on --charcoal card bg: neon link
-       11.65:1, parchment jdm 11.99:1 (AAA), smoke keeper 5.55:1 (AA). */
+       diary/keeper look, matched to the property prose treatment: both the
+       jdm caption and Keeper note inherit the 16.5px base and use --parchment
+       = 11.99:1 (AAA) on the --charcoal card. Link neon 11.65:1. */
     .activity-tutorial {
       margin-top: 12px;
       padding-top: 12px;
@@ -740,15 +741,13 @@
     .activity-tutorial-jdm {
       font-family: var(--font-diary);
       font-style: italic;
-      font-size: 15px;
       color: var(--parchment);
-      line-height: 1.6;
+      line-height: 1.7;
       margin-bottom: 8px;
     }
     .activity-tutorial-keeper {
-      font-size: 12px;
-      color: var(--smoke);
-      line-height: 1.6;
+      color: var(--parchment);
+      line-height: 1.7;
     }
     .activity-tutorial-keeper::before {
       content: "— Keeper: ";

@@ -42,3 +42,48 @@ two `tutorial` writes go live when Robert runs the seed. No rules, no status tou
 headless-tested (module parses; 13 briefs/tutorial assertions pass).
 
 ---
+## [2026-07-09] — Casa Estrella property gallery (Phase 4) [COMPLETED]
+
+> Backfilled: Step 4 flipped `/content/property/status → "confirmed"` manually, so the spec's
+> changelog write never ran. Recorded here after the fact.
+
+Shipped the property section to guests (commits da7e612, d88ab3e, d32f8e3, 18e67de).
+
+- **Gallery data** (`/content/property`, admin-write). Casa Estrella, El Madroñal — 6 bed / 6
+  bath (usable-room count; the public listing's 8/8 splits the lower apartment + counts a staff
+  flat — not surfaced). Hero + 32-image grid: 33 optimised JPGs in `gallery/` (≤1600px,
+  EXIF-stripped, <300 KB, no identifiable people), categorised exterior → living → pool →
+  bedroom → bath → amenity. `photos` is an **object** keyed `p01…p32`; the render **sorts keys**
+  (not `Object.values()`, since Firebase only guarantees order on `forEach`); each `{ url,
+  caption:"", alt }`. `hero` is its own key, **excluded from the grid** so it never doubles.
+- **Additive render** (Path A — conformed to the existing flat shape, no rewrite): facts block
+  (bed/bath chips, amenities, check-in/out, licence VV-38-4-0101440), hero `<img>`, one
+  gallery-wide J'Dinklage caption, Management blurb; per-photo `alt` from category; caption
+  omitted when empty. All via `escapeHtml()` / `renderMarkdown()`.
+- **Admin preview bypass**: confirmed view gates on `status === "confirmed" || isAdmin`, reusing
+  the existing `isAdmin` flag; `checkAdmin()` repaints on resolve to beat the listener race.
+  Non-admins saw the placeholder until the manual flip. `seed-property.html` (admin-authed,
+  idempotent `update()`, status deliberately held) wrote the content; its sign-in gate was later
+  hardened (sole `onAuthStateChanged` gate, default indexedDB persistence, origin diagnostic).
+- **Lightbox** (vanilla, no lib): click/Enter/Space on any thumbnail or the hero → full-screen
+  `role="dialog"` `aria-modal` overlay of the full-size file; prev/next via arrows + ←/→ in grid
+  order (hero first), no wrap; close on backdrop/×/Esc; focus into overlay on open and back to
+  the thumbnail on close; **Tab focus-trap**; visible focus ring; body scroll lock; alt carried
+  via safe property assignment. Overlay lives **outside `#property`** so re-renders never wipe
+  its listeners.
+- **Type passes**: centered ~680px reading column for prose (blurb/caption; grid stays
+  full-width), base font lift to 16.5px (display text untouched), facts chips ≥14px; then a
+  contrast pass raising all property reading text to **parchment #F2EFE8 = 14.84:1 (AAA)** on
+  `--asphalt` (caption was `--iron` 2.29:1, failing AA; blurb/meta were `--smoke` 6.86:1).
+- **Photo permission**: used with permission of Rick Dawson (Casa Amore / Luxury Casa Rentals);
+  verbal grant 14 May 2026, written confirmation pending; downloaded and re-hosted, never
+  hotlinked. Line stored in `/content/property` and appended to `README.md`.
+
+---
+## [2026-06-26] — App-level history begins here [COMPLETED]
+
+This per-app CHANGELOG is established as the home for nassims-folly's detailed history going
+forward. Earlier app-level entries remain in the root `change_log.md` and are not retrofitted
+here. New app-scoped entries are recorded below from this date on.
+
+---

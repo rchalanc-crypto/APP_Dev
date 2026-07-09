@@ -127,26 +127,35 @@
         const snap = await get(ref(db, 'content/activities'));
         if (!snap.exists()) { log('✗ /content/activities is empty — nothing to match.', 'err'); btn.disabled = false; btn.textContent = 'Seed Tutorials'; return; }
 
-        // Build title → [keys] map to detect the target(s) and any dupes.
-        const byTitle = {};
+        // Normalize both sides: NFC (precomposed accents) + trim. An accent
+        // stored decomposed (o + combining ´) or a stray space makes a raw
+        // === match a silent no-op — this defends against that.
+        const norm = s => String(s || '').normalize('NFC').trim();
+
+        // Diagnostic: log every live title verbatim so the exact stored value
+        // (accents, spacing) is visible — this is the ground truth to compare
+        // against the match strings.
+        log('Live activity titles:', 'inf');
+        const index = {};   // normTitle -> [{ key, raw }]
         snap.forEach(child => {
-          const t = (child.val() && child.val().title) || '';
-          (byTitle[t] = byTitle[t] || []).push(child.key);
+          const raw = (child.val() && child.val().title) || '';
+          (index[norm(raw)] = index[norm(raw)] || []).push({ key: child.key, raw });
+          log(`  • "${raw}"`, 'inf');
         });
 
         for (const { match_title, tutorial } of TUTORIALS) {
-          const keys = byTitle[match_title] || [];
-          if (keys.length === 0) {
-            log(`✗ No activity titled "${match_title}" — skipped.`, 'err');
+          const hits = index[norm(match_title)] || [];
+          if (hits.length === 0) {
+            log(`✗ No activity matching "${match_title}" (after NFC+trim) — skipped.`, 'err');
             continue;
           }
-          if (keys.length > 1) {
-            log(`⚠ ${keys.length} activities titled "${match_title}" — writing to all of them.`, 'err');
+          if (hits.length > 1) {
+            log(`⚠ ${hits.length} activities match "${match_title}" — writing to all of them.`, 'err');
           }
-          for (const key of keys) {
+          for (const { key, raw } of hits) {
             // Touch ONLY the tutorial child; leaves title/category/order/etc intact.
             await update(ref(db, `content/activities/${key}`), { tutorial });
-            log(`✓ "${match_title}" [${key}] ← tutorial ${tutorial.youtube_id}`, 'ok');
+            log(`✓ "${raw}" [${key}] ← tutorial ${tutorial.youtube_id}`, 'ok');
           }
         }
 
