@@ -1570,6 +1570,9 @@
       if (isAdmin) {
         document.getElementById('adminLink').style.display = '';
         document.getElementById('adminSep').style.display  = '';
+        // Admin resolved after the property listener may have already
+        // painted the placeholder — repaint so admins see the gallery.
+        if (propertyListenActive) paintPropertySection();
       }
     }
 
@@ -3043,14 +3046,23 @@
 
     // ── §G — Property section ─────────────────────────────────────
 
+    let propertyValue;
     function initPropertySection() {
       const propRef = ref(db, 'content/property');
       onValue(propRef, (snapshot) => {
-        const prop    = snapshot.val();
-        const section = document.getElementById('property');
-        if (!section) return;
+        propertyValue = snapshot.val();
+        paintPropertySection();
+      });
+    }
 
-        if (!prop || prop.status !== 'confirmed') {
+    function paintPropertySection() {
+      const prop    = propertyValue;
+      const section = document.getElementById('property');
+      if (!section) return;
+
+      // Admins preview the fully-seeded gallery before go-live; every other
+      // invitee still sees the placeholder until status flips to "confirmed".
+      if (!prop || (prop.status !== 'confirmed' && !isAdmin)) {
           section.innerHTML = `
             <div class="section-label">The Property</div>
             <div class="card" style="text-align:center; padding:40px 20px;">
@@ -3121,7 +3133,6 @@
               }).join('')}
             </div>` : ''}
         `;
-      });
     }
 
     // ── Event listeners ───────────────────────────────────────────
