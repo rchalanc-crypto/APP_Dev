@@ -3065,7 +3065,20 @@
           return;
         }
 
-        const photos = prop.photos ? Object.values(prop.photos) : [];
+        // Photos: object keyed p01..pNN in category order. Firebase does
+        // not guarantee key order on val() iteration, so sort keys ourselves.
+        const photoKeys = prop.photos ? Object.keys(prop.photos).sort() : [];
+        const facts     = prop.facts || {};
+        const amenities = Array.isArray(facts.amenities) ? facts.amenities : [];
+        const chip = 'display:inline-block; padding:5px 12px; border:1px solid var(--iron);'
+                   + ' border-radius:20px; font-size:12px; color:var(--parchment);'
+                   + ' background:rgba(255,255,255,0.03);';
+        const metaBits = [];
+        if (facts.checkin)  metaBits.push(`Check-in ${escapeHtml(facts.checkin)}`);
+        if (facts.checkout) metaBits.push(`Checkout ${escapeHtml(facts.checkout)}`);
+        if (facts.licence)  metaBits.push(`Licence ${escapeHtml(facts.licence)}`);
+        const hasFacts = facts.bedrooms || facts.bathrooms || amenities.length || metaBits.length;
+
         section.innerHTML = `
           <div class="section-label">The Property</div>
           <div style="margin-bottom:16px;">
@@ -3076,17 +3089,36 @@
             <div style="color:var(--smoke); font-size:14px; margin-top:4px;">
               ${escapeHtml(prop.location || '')}
             </div>
-            <div style="color:var(--smoke); font-size:14px; line-height:1.7; margin-top:12px; max-width:640px;">
-              ${escapeHtml(prop.description || '')}
-            </div>
           </div>
-          ${photos.length ? `
+          ${prop.hero ? `
+            <img src="${escapeHtml(prop.hero)}" alt="${escapeHtml(prop.hero_alt || '')}"
+                 style="width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:8px; margin-bottom:16px;"
+                 loading="lazy">` : ''}
+          ${prop.caption_jdinklage ? `
+            <div style="font-family:var(--font-diary); font-style:italic; color:var(--iron);
+                        font-size:15px; line-height:1.7; max-width:640px; margin-bottom:20px;">
+              ${renderMarkdown(prop.caption_jdinklage)}
+            </div>` : ''}
+          ${prop.description ? `
+            <div style="color:var(--smoke); font-size:14px; line-height:1.7; max-width:640px; margin-bottom:16px;">
+              ${renderMarkdown(prop.description)}
+            </div>` : ''}
+          ${hasFacts ? `
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+              ${facts.bedrooms  ? `<span style="${chip}">${escapeHtml(String(facts.bedrooms))} bedrooms</span>` : ''}
+              ${facts.bathrooms ? `<span style="${chip}">${escapeHtml(String(facts.bathrooms))} bathrooms</span>` : ''}
+              ${amenities.map(a => `<span style="${chip}">${escapeHtml(a)}</span>`).join('')}
+            </div>
+            ${metaBits.length ? `<div style="color:var(--smoke); font-size:13px; margin-bottom:8px;">${metaBits.join(' · ')}</div>` : ''}
+          ` : ''}
+          ${photoKeys.length ? `
             <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:8px; margin-top:16px;">
-              ${photos.map(p => `
-                <img src="${escapeHtml(p.url)}" alt="${escapeHtml(p.caption || '')}"
+              ${photoKeys.map(k => {
+                const p = prop.photos[k] || {};
+                return `<img src="${escapeHtml(p.url)}" alt="${escapeHtml(p.alt || p.caption || '')}"
                      style="width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:6px;"
-                     loading="lazy">
-              `).join('')}
+                     loading="lazy">`;
+              }).join('')}
             </div>` : ''}
         `;
       });

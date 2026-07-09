@@ -50,6 +50,13 @@ Console paste is for emergencies only and must be back-ported to
 /content/...                  voyage content — admin-write only (Phase 3+)
 ```
 
+## Property photo permission
+
+Photos of Casa Estrella used with permission of Rick Dawson (Casa Amore /
+Luxury Casa Rentals, same operator). Verbal grant 14 May 2026; written
+confirmation pending. Downloaded and re-hosted per the grant; never hotlinked.
+Source listing: luxurycasarentals.com/accommodation/31.
+
 ## No-warranty disclaimer
 
 _This is a personal project with no uptime guarantee. Data may be lost._

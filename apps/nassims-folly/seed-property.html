@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nassim's Folly — Property Seed</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: monospace; background: #1a1a2e; color: #e0e0e0; padding: 32px; line-height: 1.6; }
+    h1 { color: #4a90b8; margin-bottom: 8px; }
+    p  { color: #aaa; margin-bottom: 16px; font-size: 0.9rem; }
+    .warn { color: #f59e0b; background: #1a1a00; border: 1px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; }
+    button {
+      background: #2b6b8a; color: white; border: none; padding: 12px 28px;
+      border-radius: 6px; font-size: 1rem; cursor: pointer; margin-right: 12px;
+    }
+    button:hover { background: #1a3a5c; }
+    button:disabled { opacity: 0.4; cursor: default; }
+    #log { margin-top: 24px; background: #111; border-radius: 6px; padding: 16px; font-size: 0.85rem; min-height: 80px; }
+    .ok  { color: #4ade80; }
+    .err { color: #f87171; }
+    .inf { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <h1>Nassim's Folly — Property Seed</h1>
+  <p>One-time seed: Casa Estrella facts, hero, caption, permission, and 32 gallery photos to <code>/content/property</code>.</p>
+  <p id="authStatus" style="color:#f59e0b;">Checking auth…</p>
+
+  <div class="warn" id="warnOnce">
+    This writes property content via <strong>update()</strong> — idempotent, safe to re-run.
+    It deliberately does <strong>NOT</strong> touch <code>/content/property/status</code>: the gallery stays
+    hidden behind the "Scouting in Progress" placeholder until you flip status to
+    <code>"confirmed"</code> yourself (Step 4 go-live).
+  </div>
+
+  <button id="seedBtn" disabled onclick="runSeed()">Seed Property Content</button>
+  <div id="log"></div>
+
+  <script type="module">
+    import { initializeApp }
+      from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import {
+      getAuth, onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getDatabase, ref, get, update }
+      from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey:            'AIzaSyBTa08k41HZeCO1OdIByPEWc8wCwKAzEcQ',
+      authDomain:        'wal-nassims-folly.firebaseapp.com',
+      databaseURL:       'https://wal-nassims-folly-default-rtdb.firebaseio.com',
+      projectId:         'wal-nassims-folly',
+      storageBucket:     'wal-nassims-folly.firebasestorage.app',
+      messagingSenderId: '224165103778',
+      appId:             '1:224165103778:web:561f1fe488cdbe7815effb'
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    function log(msg, cls = 'inf') {
+      const el = document.getElementById('log');
+      el.innerHTML += `<div class="${cls}">${msg}</div>`;
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        document.getElementById('authStatus').textContent =
+          'Not signed in. Sign in via the main app first, then return here.';
+        return;
+      }
+      const adminSnap = await get(ref(db, `admin/${user.uid}`)).catch(() => null);
+      if (!adminSnap || !adminSnap.exists()) {
+        document.getElementById('authStatus').textContent =
+          `Signed in as ${user.email} — but you are not an admin. Cannot seed.`;
+        return;
+      }
+      document.getElementById('authStatus').textContent =
+        `Signed in as ${user.email} (admin). Ready to seed.`;
+      document.getElementById('seedBtn').disabled = false;
+    });
+
+    // ── Gallery photos (32) ─────────────────────────────────────────
+    // Keys p01..p32 in category order: exterior → living → pool →
+    // bedroom → bath → amenity. The render sorts by key, so key order
+    // IS display order. Each { url, caption:"", alt }. Per-image
+    // caption stays empty — there is one gallery-wide J'Dinklage
+    // caption only (caption_jdinklage below). alt derived from category.
+    const GALLERY = [
+      ['exterior-01', 'exterior'],
+      ['exterior-02', 'exterior'],
+      ['living-01',   'living'],
+      ['living-02',   'living'],
+      ['living-03',   'living'],
+      ['living-04',   'living'],
+      ['living-05',   'living'],
+      ['living-06',   'living'],
+      ['living-07',   'living'],
+      ['living-08',   'living'],
+      ['pool-01',     'pool'],
+      ['pool-02',     'pool'],
+      ['pool-03',     'pool'],
+      ['bedroom-01',  'bedroom'],
+      ['bedroom-02',  'bedroom'],
+      ['bedroom-03',  'bedroom'],
+      ['bedroom-04',  'bedroom'],
+      ['bedroom-05',  'bedroom'],
+      ['bedroom-06',  'bedroom'],
+      ['bedroom-07',  'bedroom'],
+      ['bedroom-08',  'bedroom'],
+      ['bath-01',     'bath'],
+      ['bath-02',     'bath'],
+      ['bath-03',     'bath'],
+      ['bath-04',     'bath'],
+      ['amenity-01',  'amenity'],
+      ['amenity-02',  'amenity'],
+      ['amenity-03',  'amenity'],
+      ['amenity-04',  'amenity'],
+      ['amenity-05',  'amenity'],
+      ['amenity-06',  'amenity'],
+      ['amenity-07',  'amenity']
+    ];
+
+    const ALT_LABEL = {
+      exterior: 'exterior',
+      living:   'living area',
+      pool:     'pool',
+      bedroom:  'bedroom',
+      bath:     'bathroom',
+      amenity:  'amenities'
+    };
+
+    const photos = {};
+    GALLERY.forEach(([name, cat], i) => {
+      const key = 'p' + String(i + 1).padStart(2, '0');   // p01..p32
+      photos[key] = {
+        url:     `gallery/${name}.jpg`,
+        caption: '',
+        alt:     `Casa Estrella — ${ALT_LABEL[cat]}`
+      };
+    });
+
+    // ── Property content (status NOT written — held via update()) ────
+    const PROPERTY = {
+      name:     'Casa Estrella',
+      location: 'El Madroñal, Costa Adeje, Tenerife',
+      facts: {
+        bedrooms:  6,
+        bathrooms: 6,
+        amenities: ['Heated pool', 'Gym', 'Elevator', 'Private garage', '85" TV', 'BBQ terrace'],
+        checkin:   '16:00–20:00',
+        checkout:  '08:00–11:00',
+        licence:   'VV-38-4-0101440'
+      },
+      hero:     'gallery/hero.jpg',
+      hero_alt: 'Casa Estrella — heated pool and El Teide',
+      description:
+        "The Management is pleased to confirm that accommodation has been secured. What follows is " +
+        "provided for informational purposes and constitutes the entirety of the Management's warranty — " +
+        "which is to say, none.\n\n" +
+        "**Casa Estrella**, El Madroñal, Costa Adeje. Six bedrooms and six bathrooms. Heated pool, " +
+        "private gym, elevator, private garage, an 85-inch television reserved for Required Viewing, and " +
+        "a BBQ terrace. Check-in 16:00–20:00; checkout 08:00–11:00. Licence VV-38-4-0101440, on file.\n\n" +
+        "Photographs used with the kind permission of the property operator. The Management downloaded " +
+        "them fair and square and is hotlinking nothing.",
+      caption_jdinklage:
+        "Behold the base of operations. I have personally secured Casa Estrella as the expedition's " +
+        "forward station — six sleeping chambers, a heated pool I take full responsibility for having " +
+        "willed into being, and an elevator, which conveys a man between floors without the indignity of " +
+        "stairs. I inspected the perimeter at length; it is defensible. The gymnasium will keep the unit " +
+        "at fighting weight, and the terrace is suitable for both feasting and the issuing of orders. The " +
+        "Keeper has reviewed the same rooms and filed a shorter report. Mine is the correct one. Provision " +
+        "yourselves and rest — the voyage begins the moment you arrive.\n\n" +
+        "— J'Dinklage Morgoone, Chronicler to the Expedition",
+      permission:
+        "Photos of Casa Estrella used with permission of Rick Dawson (Casa Amore / Luxury Casa Rentals, " +
+        "same operator). Verbal grant 14 May 2026; written confirmation pending. Downloaded and re-hosted " +
+        "per the grant; never hotlinked. Source listing: luxurycasarentals.com/accommodation/31.",
+      photos: photos
+    };
+
+    window.runSeed = async function() {
+      const btn = document.getElementById('seedBtn');
+      btn.disabled = true;
+      btn.textContent = 'Seeding…';
+      document.getElementById('log').innerHTML = '';
+
+      try {
+        const statusSnap = await get(ref(db, 'content/property/status')).catch(() => null);
+        const curStatus  = statusSnap && statusSnap.exists() ? statusSnap.val() : '(unset)';
+        log(`Current status: ${curStatus} — will be left untouched.`, 'inf');
+
+        // update() merges the provided top-level children and leaves
+        // status alone. Idempotent: re-running rewrites the same values.
+        await update(ref(db, 'content/property'), PROPERTY);
+        log(`✓ /content/property written (${Object.keys(photos).length} photos + facts + hero + caption + permission).`, 'ok');
+
+        const check = await get(ref(db, 'content/property/status')).catch(() => null);
+        const after = check && check.exists() ? check.val() : '(unset)';
+        if (after === 'confirmed') {
+          log(`⚠ status is "confirmed" — the gallery is LIVE to guests. If that was not intended, unset it.`, 'err');
+        } else {
+          log(`Status still "${after}" — gallery remains hidden behind the placeholder. Flip to "confirmed" at go-live.`, 'ok');
+        }
+        log('Done.', 'ok');
+        btn.textContent = 'Seed Complete';
+      } catch (err) {
+        log('Error: ' + err.message, 'err');
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = 'Seed Property Content';
+      }
+    };
+  </script>
+</body>
+</html>
