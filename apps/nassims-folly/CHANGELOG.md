@@ -10,6 +10,27 @@
 > Entries ordered newest-first (reverse chronological); mark each [COMPLETED] or [PENDING].
 
 ---
+## [2026-07-09] — Readability: diary prose 18px + evergreen Crew section [COMPLETED]
+
+Per `SPEC-folly-readability-crew.md`. The prose-col (~680px centered) and 16.5px base font were
+already live on briefs/diary/property from the prior type pass — not rebuilt.
+
+- **Diary prose → 18px.** `.diary-body` had no explicit `font-size` and was inheriting the 16.5px
+  base; bumped to 18px (Cormorant Garamond has a small x-height and needs it). Body/brief prose
+  and buttons stay at the 16.5px base; display text (countdown 72px, nav, section-labels)
+  untouched.
+- **New `#crew` section** inserted **after `#briefs`, before `#diary`** (A1), wrapped in
+  `.diary-entry .prose-col` so it shares the centered 680px reading column. Evergreen "who are
+  these two people" notice from the Management. Scoped `#crew` CSS leans on the diary card +
+  blockquote look: `crew-name` (Barlow Condensed 700, neon), `blockquote` (Cormorant italic 18px,
+  terracotta left-border), intro/outro/byline in the body font.
+- **Canon copy verbatim** — J'Dinklage (ASCII apostrophe, ×5), "the Captain" preserved in both
+  pull-quotes and prose (not corrected), both quotes as `<blockquote>`, byline `— Robert (Human
+  Mule)`. No curly quotes. **No nav item added** (A2) — scroll-spy untouched. Rules/DB/data
+  untouched. Headless env (WSL): no browser; visual pass at wide + 375px pending Robert's live
+  verify signed-in.
+
+---
 ## [2026-07-09] — Required Viewing retired → per-activity tutorials + briefs sign-off fix [COMPLETED]
 
 Folded the standalone Required Viewing section into the activities it belongs to, and fixed a
