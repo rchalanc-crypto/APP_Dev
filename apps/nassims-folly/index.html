@@ -3192,12 +3192,12 @@
                  style="width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:8px; margin-bottom:16px;"
                  loading="lazy">` : ''}
           ${prop.caption_jdinklage ? `
-            <div class="prose-col" style="font-family:var(--font-diary); font-style:italic; color:var(--iron);
+            <div class="prose-col" style="font-family:var(--font-diary); font-style:italic; color:var(--parchment);
                         line-height:1.7; margin-bottom:20px;">
               ${renderMarkdown(prop.caption_jdinklage)}
             </div>` : ''}
           ${prop.description ? `
-            <div class="prose-col" style="color:var(--smoke); line-height:1.7; margin-bottom:16px;">
+            <div class="prose-col" style="color:var(--parchment); line-height:1.7; margin-bottom:16px;">
               ${renderMarkdown(prop.description)}
             </div>` : ''}
           ${hasFacts ? `
@@ -3206,7 +3206,7 @@
               ${facts.bathrooms ? `<span class="prop-chip" style="${chip}">${escapeHtml(String(facts.bathrooms))} bathrooms</span>` : ''}
               ${amenities.map(a => `<span class="prop-chip" style="${chip}">${escapeHtml(a)}</span>`).join('')}
             </div>
-            ${metaBits.length ? `<div style="color:var(--smoke); font-size:13px; margin-bottom:8px;">${metaBits.join(' · ')}</div>` : ''}
+            ${metaBits.length ? `<div style="color:var(--parchment); font-size:13px; margin-bottom:8px;">${metaBits.join(' · ')}</div>` : ''}
           ` : ''}
           ${photoKeys.length ? `
             <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:8px; margin-top:16px;">
