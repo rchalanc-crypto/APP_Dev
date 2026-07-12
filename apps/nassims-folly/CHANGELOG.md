@@ -12,7 +12,7 @@
 ---
 ## [2026-07-11] — Ranker geo/temporal rework + snapshot-collector fix + El Médano embed [COMPLETED]
 
-Per `SPEC-folly-ranker-geo-rework.md` (Steps 1–3), one session, five path-scoped commits,
+Per `SPEC-folly-ranker-geo-rework.md` (Steps 1–3), one session, six path-scoped commits,
 each verified by a scratch node audit harness (68 checks final: static / logic / synthetic
 failures / live Open-Meteo / HEAD-repro) with Robert's live passes gating between rulings.
 
@@ -50,7 +50,10 @@ failures / live Open-Meteo / HEAD-repro) with Robert's live passes gating betwee
   first-paint cost, zero third-party requests until tapped; domain pinned (`EMBED_ORIGIN`,
   the app's only iframe); permanent `noopener` new-tab link-out beneath. Skeptic supply-chain
   touch: no criticals; pre-existing Important ticketed (tabler icons `@latest` unpinned,
-  `index.html:8`).
+  `index.html:8`). **Polish** (`53c84c6`): iframe sized to Windfinder's natural height
+  (450px, derived from their own widget CSS), pressure row dropped via `show_pressure=0`,
+  max-width 560px centered white inset card — no dark theme exists on their side;
+  lazy-load re-verified post-resize (harness steady at 68 green).
 - **Debug switch**: per-activity score table gated behind `localStorage.folly_rank_debug='1'`
   (or `?rankdebug=1`, persists) for trip-time bias calibration; ungated one-line `[ranker]
   scored N/13…` breadcrumb always prints and names the switch; orphan/cluster-failure

@@ -9,6 +9,29 @@
 > Entries ordered newest-first (reverse chronological).
 
 ---
+## [2026-07-11] — RTDB snapshot-iteration footgun (all apps) + audit-harness verification protocol [COMPLETED]
+
+Two program-level items from the nassims-folly ranker session; app-level detail lives in
+`apps/nassims-folly/CHANGELOG.md` `[2026-07-11]` — not restated here.
+
+- **`DataSnapshot.forEach` early-cancel footgun — audit every RTDB app.** Firebase JS SDK
+  10.7.1 cancels iteration when the callback returns ANY truthy value (`!!e(k,v)` in
+  `inorderTraversal`, verified in the shipped SDK source). `push()`/`unshift()` in an
+  implicit-return arrow callback return the new array length — truthy from the first child —
+  so `snapshot.forEach(c => list.push(...))` collects exactly ONE record. This silently
+  truncated every nassims-folly content list since Phase 3. Fixed there via a shared
+  `collectChildren(snapshot)` with a braced callback. **ride-tracker and any future app using
+  RTDB snapshot iteration must audit for the same pattern** — braced callbacks or the shared
+  collector, never an implicit-return snapshot callback.
+- **Verification protocol adopted (program-wide):** a scratch node audit harness gates every
+  build step — static lint / logic (no network) / synthetic-failure injection / live-API
+  asserts / deployed-vs-HEAD SHA-256 match — and the human browser pass gates COMMITS only.
+  Mid-build browser gates are unrunnable on auth-gated apps (the live site runs old code; a
+  local origin breaks Firebase auth). Corollary: agent-driven console checks must state which
+  log levels they can see — a warn/error-only browser agent produced a false "vanished
+  logging" regression report this session.
+
+---
 ## [2026-06-26] — ride-tracker: diary reconcile + editor edit-gate + silent-drop hotfix [COMPLETED]
 
 Per `apps/ride-tracker/SPEC-ridetracker-reconcile-hotfix.md` (gated session; spec authored on
