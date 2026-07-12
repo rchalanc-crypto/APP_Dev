@@ -2642,6 +2642,7 @@
         allActivities = [];
         snapshot.forEach(child => allActivities.push({ id: child.key, ...child.val() }));
         allActivities.sort((a, b) => (a.order || 0) - (b.order || 0));
+        rankGeoAudit(allActivities);
         renderActivityFilters();
         renderActivities();
       }, { onlyOnce: true });
@@ -3066,7 +3067,223 @@
       }
     }
 
-    // ── §F — Activity ranker ──────────────────────────────────────
+    // ── §F — Activity ranker: geo/temporal rework ────────────────
+    // Step 1: cluster fetch layer + per-cluster central model.
+    // Step 2: per-activity window scoping → El Médano bias → roll-up (best
+    // activity wins the category, winner named) → garage-day path.
+    // Per-activity geo is authored code-side (ACTIVITY_GEO, frozen 2026-07-11).
+    // NO Firebase data or rules are touched. Weather-exempt: food, culture, and
+    // the fixed-date rally spectator events (motor orders 21–24) — never
+    // conditions-scored. Karting is the only weather-scored motor activity.
+
+    const GRID_ROUND         = 0.1;            // ~11 km: coords rounded to this share a grid cell
+    const ELEV_BANDS         = [300, 1200];    // sea <300 ≤ mid <1200 ≤ high (m)
+    const RANK_MODELS        = ['ecmwf_ifs', 'gfs_seamless', 'icon_seamless', 'meteofrance_seamless']; // Canary set — NO GEM (that's the BC/Squamish model)
+    const RANK_WX_TZ         = 'Atlantic/Canary';
+    const RANK_FORECAST_DAYS = 2;              // today + 1; ranker reads today, window-scoped
+    const RANK_WX_TTL        = 2 * 60 * 60 * 1000; // 2h, mirrors the widgets
+    // Per-cluster central estimate: default = ensemble median; El Médano = ECMWF IFS
+    // (native 9 km, slug 'ecmwf_ifs' — best free Canary model). The Granadilla gap
+    // accelerates the trades below any 9 km grid, hence the (Step 2) bias hook.
+    // Spread/confidence is ALWAYS computed across the full ensemble, every cluster.
+    const CENTRAL_MODEL      = { elmedano: 'ecmwf_ifs' };
+    const ELMEDANO_WIND_BIAS = { mult: 1.0, add: 0 }; // NEUTRAL default. Calibrate against a live
+    // El Médano reading (iKitesurf/Windguru) during testing/trip: the Granadilla acceleration
+    // zone tends to exceed the 9 km model. Do NOT ship a non-neutral guess.
+    // Ruled category thresholds (2026-07-11) — named so they can be tuned against
+    // reality later without touching scoring logic. Units: precip mm (window sum),
+    // wind kn (window max central), code = WMO weather code.
+    const RANK_LIMITS = {
+      stormCode: 95,                                                        // thunderstorm = red, any category
+      wheels: { redPrecip: 6, redWind: 30, amberPrecip: 2, amberWind: 20 }, // golf
+      feet:   { redPrecip: 8, redWind: 35, amberPrecip: 2, amberCode: 51 }, // hiking
+      motor:  { redPrecip: 4, amberPrecip: 1, amberCode: 51 }               // karting (outdoor)
+    };
+
+    // Authored per-activity geo. Keyed by title-slug (rankSlugify of the live
+    // record title) — legible, survives a reseed, and a title edit orphans the
+    // entry loudly (dev-warning list) + falls back safe (exempt) at runtime.
+    // window = local-hour [start, end). Freeze: 13 weather-sensitive records.
+    const ACTIVITY_GEO = {
+      'el-medano':                              { title: 'El Médano',                                  category: 'wind',   lat: 28.0436, lon: -16.5388, elevation_m: 5,    window: [13, 19], zone: 'El Médano' },
+      'cabezo-north-of-el-medano':              { title: 'Cabezo (north of El Médano)',                category: 'wind',   lat: 28.0481, lon: -16.5256, elevation_m: 5,    window: [13, 19], zone: 'El Médano — Cabezo' },
+      'playa-de-las-teresitas':                 { title: 'Playa de las Teresitas',                     category: 'water',  lat: 28.51,   lon: -16.19,   elevation_m: 5,    window: [10, 15], zone: 'Teresitas (north)' },
+      'golf-costa-adeje':                       { title: 'Golf Costa Adeje',                           category: 'wheels', lat: 28.09,   lon: -16.74,   elevation_m: 50,   window: [8, 14],  zone: 'Costa Adeje (south)' },
+      'golf-del-sur':                           { title: 'Golf del Sur',                               category: 'wheels', lat: 28.02,   lon: -16.61,   elevation_m: 20,   window: [8, 14],  zone: 'Golf del Sur (southeast)' },
+      'buenavista-golf':                        { title: 'Buenavista Golf',                            category: 'wheels', lat: 28.37,   lon: -16.85,   elevation_m: 40,   window: [8, 14],  zone: 'Buenavista (northwest)' },
+      'mount-teide-summit':                     { title: 'Mount Teide Summit',                         category: 'feet',   lat: 28.2724, lon: -16.6425, elevation_m: 3555, window: [6, 11],  zone: 'Teide summit' },
+      'anaga-mountains-sendero-de-los-sentidos':{ title: 'Anaga Mountains — Sendero de los Sentidos',  category: 'feet',   lat: 28.534,  lon: -16.285,  elevation_m: 920,  window: [8, 13],  zone: 'Anaga (north)' },
+      'masca-gorge':                            { title: 'Masca Gorge',                                category: 'feet',   lat: 28.31,   lon: -16.84,   elevation_m: 600,  window: [8, 13],  zone: 'Masca (northwest)' },
+      'barranco-del-infierno-adeje':            { title: 'Barranco del Infierno (Adeje)',              category: 'feet',   lat: 28.11,   lon: -16.71,   elevation_m: 350,  window: [8, 13],  zone: 'Adeje (south)' },
+      'los-gigantes-cliffs-by-sea-kayak':       { title: 'Los Gigantes Cliffs by Sea Kayak',           category: 'water',  lat: 28.24,   lon: -16.84,   elevation_m: 5,    window: [8, 13],  zone: 'Los Gigantes (west)' },
+      'la-caleta-adeje-coves':                  { title: 'La Caleta (Adeje) Coves',                    category: 'water',  lat: 28.09,   lon: -16.79,   elevation_m: 5,    window: [9, 15],  zone: 'La Caleta (south)' },
+      'karting-club-tenerife':                  { title: 'Karting Club Tenerife',                      category: 'motor',  lat: 28.083,  lon: -16.732,  elevation_m: 150,  window: [10, 18], zone: 'Costa Adeje (south)' }
+    };
+
+    // Stable slug for matching live records ↔ ACTIVITY_GEO (diacritic-folded).
+    function rankSlugify(s) {
+      return String(s).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    // Dev-warning: an ACTIVITY_GEO key with no matching live record title was
+    // orphaned by a title edit — loud in console, safe (exempt) at runtime.
+    function rankGeoAudit(records) {
+      const live = new Set(records.map(a => rankSlugify(a.title)));
+      const orphans = Object.keys(ACTIVITY_GEO).filter(k => !live.has(k));
+      if (orphans.length)
+        console.warn('[ranker] ACTIVITY_GEO entries orphaned by title edits (their activities go unscored/exempt):', orphans.join(', '));
+    }
+    function roundGrid(v)   { return Math.round(v / GRID_ROUND) * GRID_ROUND; }
+    function elevBand(m)    { return m < ELEV_BANDS[0] ? 'sea' : m < ELEV_BANDS[1] ? 'mid' : 'high'; }
+    function clusterKeyFor(lat, lon, elev) {
+      return `${roundGrid(lat).toFixed(1)}_${roundGrid(lon).toFixed(1)}_${elevBand(elev)}`;
+    }
+    const EL_MEDANO_KEY = clusterKeyFor(ACTIVITY_GEO['el-medano'].lat, ACTIVITY_GEO['el-medano'].lon, ACTIVITY_GEO['el-medano'].elevation_m);
+
+    // Collapse ACTIVITY_GEO → fetch clusters by (grid cell, elevation band).
+    // Anchor coords = first member's exact coords (all members share the cell).
+    function buildRankClusters() {
+      const clusters = new Map();
+      for (const [slug, g] of Object.entries(ACTIVITY_GEO)) {
+        const key = clusterKeyFor(g.lat, g.lon, g.elevation_m);
+        let c = clusters.get(key);
+        if (!c) {
+          c = { key, lat: g.lat, lon: g.lon, elevation_m: g.elevation_m,
+                band: elevBand(g.elevation_m), isElMedano: key === EL_MEDANO_KEY,
+                needsMarine: false, members: [] };
+          clusters.set(key, c);
+        }
+        c.members.push(slug);
+        if (g.category === 'water') c.needsMarine = true; // wave only feeds water scoring
+      }
+      return clusters;
+    }
+
+    // One elevation-aware, Atlantic/Canary, RANK_MODELS forecast per cluster
+    // (+ marine wave for sea-band). 2h cache keyed by the cluster cell.
+    // NOTE: this is a NEW ranker fetch (RANK_MODELS incl. ecmwf_ifs, elevation,
+    // Atlantic/Canary), so El Médano is NOT a widget cache-hit yet — the kite
+    // widget still runs the old model set (the deferred GEM-swap ticket). Once
+    // that ticket aligns the widget to RANK_MODELS, El Médano dedupes for free.
+    async function fetchClusterWx(cluster) {
+      const { lat, lon, elevation_m, needsMarine, key } = cluster;
+      const cacheKey = `rankwx_${key}`;
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(cacheKey) || 'null'); }
+      catch (e) { localStorage.removeItem(cacheKey); } // corrupt cache = miss, refetch
+      if (cached && cached.data && Date.now() - cached.ts < RANK_WX_TTL)
+        return { ...cached.data, asOf: new Date(cached.ts), cached: true };
+
+      const tz = encodeURIComponent(RANK_WX_TZ);
+      const wxUrl =
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+        `&elevation=${elevation_m}` +
+        `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,precipitation,temperature_2m,weather_code` +
+        `&daily=weather_code,precipitation_sum,wind_speed_10m_max,temperature_2m_max` +
+        `&models=${RANK_MODELS.join(',')}` +
+        `&wind_speed_unit=kn&timezone=${tz}&forecast_days=${RANK_FORECAST_DAYS}`;
+
+      const reqs = [fetch(wxUrl)];
+      if (needsMarine)
+        reqs.push(fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}` +
+          `&daily=wave_height_max&timezone=${tz}&forecast_days=${RANK_FORECAST_DAYS}`));
+
+      const [wxRes, marineRes] = await Promise.all(reqs);
+      if (!wxRes.ok) throw new Error(`Ranker wx API ${wxRes.status} for cluster ${key}`);
+      const raw = await wxRes.json();
+      if (!raw.hourly || !raw.hourly.time)
+        throw new Error(`Ranker wx bad payload for ${key}: ${JSON.stringify(raw).slice(0, 160)}`);
+
+      // Per-model arrays are suffixed with the model slug when models= is set.
+      const models = {};
+      for (const m of RANK_MODELS) {
+        const speed = raw.hourly[`wind_speed_10m_${m}`];
+        if (!speed || !speed.some(v => v != null)) continue; // no coverage for this model here
+        models[m] = {
+          speed,
+          gusts:  raw.hourly[`wind_gusts_10m_${m}`]     || [],
+          dir:    raw.hourly[`wind_direction_10m_${m}`] || [],
+          precip: raw.hourly[`precipitation_${m}`]      || [],
+          temp:   raw.hourly[`temperature_2m_${m}`]     || [],
+          code:   raw.hourly[`weather_code_${m}`]       || [],
+          dPrecip:raw.daily?.[`precipitation_sum_${m}`] || [],
+          dCode:  raw.daily?.[`weather_code_${m}`]      || []
+        };
+      }
+      // No covering model at all (nulled/empty hourly) = no data, not flat calm —
+      // throw so the per-cluster catch leaves this cluster unscored this cycle.
+      if (!Object.keys(models).length)
+        throw new Error(`Ranker wx: no model coverage for ${key}`);
+      const marine = (marineRes && marineRes.ok) ? await marineRes.json() : null;
+
+      const data = { time: raw.hourly.time, models, marine, elevation_m };
+      localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+      return { ...data, asOf: new Date(), cached: false };
+    }
+
+    // Per-cluster central wind series + full-ensemble spread (per hour).
+    // Central = ensemble median, EXCEPT El Médano uses the ECMWF IFS member.
+    // Spread is ALWAYS max−min across every covering model (confidence signal
+    // is never collapsed by weighting the centre).
+    function clusterWindSeries(forecast, isElMedano) {
+      const names = Object.keys(forecast.models);
+      const n = forecast.time.length;
+      const central = new Array(n).fill(null);
+      const spread  = new Array(n).fill(null);
+      const em = isElMedano ? CENTRAL_MODEL.elmedano : null;
+      const emCovers = em && forecast.models[em];
+      for (let i = 0; i < n; i++) {
+        const vals = names.map(m => forecast.models[m].speed[i]).filter(v => v != null);
+        if (!vals.length) continue;
+        spread[i] = Math.max(...vals) - Math.min(...vals);
+        central[i] = (emCovers && forecast.models[em].speed[i] != null)
+          ? forecast.models[em].speed[i]   // ECMWF IFS central for El Médano
+          : median(vals);                  // ensemble median elsewhere
+      }
+      return {
+        central, spread,
+        modelCount:  names.length,
+        centralModel: (emCovers ? em : 'ensemble-median')
+      };
+    }
+
+    // Window-scoped day-0 conditions for one activity on its cluster forecast.
+    // wind   = max central wind across the activity's local window (biased for El Médano)
+    // precip = sum over window of the per-hour cross-model median
+    // code   = the CENTRAL model's weather code, worst hour in window (ruled
+    //          2026-07-11: ECMWF member at El Médano, median member elsewhere —
+    //          one pessimistic model must not flag a dry cluster)
+    // wave   = marine day-0 max (marine API is daily-only; sea-band clusters only)
+    // spread = median ensemble spread across the window (confidence signal)
+    // Returns null (activity unscored) when the window has no usable data.
+    function activityConditions(forecast, windSeries, isElMedano, window) {
+      const idx = [];
+      forecast.time.forEach((t, i) => {
+        const h = parseInt(t.slice(11, 13), 10);
+        if (Math.floor(i / 24) === 0 && h >= window[0] && h < window[1]) idx.push(i);
+      });
+      const winds = idx.map(i => windSeries.central[i]).filter(v => v != null);
+      if (!winds.length) return null;
+      let wind = Math.max(...winds);
+      if (isElMedano) wind = wind * ELMEDANO_WIND_BIAS.mult + ELMEDANO_WIND_BIAS.add;
+      const names  = Object.keys(forecast.models);
+      const precip = idx.reduce((sum, i) =>
+        sum + (median(names.map(m => forecast.models[m].precip[i])) ?? 0), 0);
+      const centralM = forecast.models[windSeries.centralModel]; // undefined ⇒ ensemble-median
+      const codeAt = i => {
+        if (centralM) return centralM.code[i];
+        const v = names.map(m => forecast.models[m].code[i]).filter(x => x != null).sort((a, b) => a - b);
+        return v.length ? v[Math.floor((v.length - 1) / 2)] : null; // lower-median member = a real code
+      };
+      const codes   = idx.map(codeAt).filter(v => v != null);
+      const spreads = idx.map(i => windSeries.spread[i]).filter(v => v != null);
+      return {
+        wind, precip,
+        weatherCode: codes.length ? Math.max(...codes) : 0,
+        wave: forecast.marine?.daily?.wave_height_max?.[0] ?? 0,
+        spreadKn: spreads.length ? median(spreads) : null
+      };
+    }
 
     function scoreCategory(cat, windKnots, weatherCode, precipMm, waveM) {
       switch(cat) {
@@ -3076,12 +3293,25 @@
           if (precipMm > 2) return 'red';
           if (waveM > 2 || windKnots > 25) return 'amber';
           return 'green';
-        case 'wheels':
-          return precipMm > 2 ? 'amber' : 'green';
-        case 'feet':
-          if (precipMm > 2 || weatherCode >= 51) return 'amber';
+        case 'wheels': { // golf: low precip + moderate wind (was a precip-only heuristic
+          // with no red state — garage day was unreachable; flagged in Step 0)
+          const L = RANK_LIMITS.wheels;
+          if (precipMm > L.redPrecip || windKnots > L.redWind || weatherCode >= RANK_LIMITS.stormCode) return 'red';
+          if (precipMm > L.amberPrecip || windKnots > L.amberWind) return 'amber';
           return 'green';
-        case 'motor':   return 'green';
+        }
+        case 'feet': { // hiking: heavy rain/storm ends the day rather than dampens it
+          const L = RANK_LIMITS.feet;
+          if (precipMm > L.redPrecip || windKnots > L.redWind || weatherCode >= RANK_LIMITS.stormCode) return 'red';
+          if (precipMm > L.amberPrecip || weatherCode >= L.amberCode) return 'amber';
+          return 'green';
+        }
+        case 'motor': { // karting is outdoors: was a hardcoded 'green' heuristic
+          const L = RANK_LIMITS.motor;
+          if (precipMm > L.redPrecip || weatherCode >= RANK_LIMITS.stormCode) return 'red';
+          if (precipMm > L.amberPrecip || weatherCode >= L.amberCode) return 'amber';
+          return 'green';
+        }
         case 'food':
         case 'culture':
           return (precipMm > 2 || weatherCode >= 51) ? 'green' : 'amber';
@@ -3090,24 +3320,77 @@
     }
 
     async function initActivityRanker() {
+      const out = document.getElementById('rankerOutput');
       try {
-        const { wx, marine } = await fetchWeather(28.0436, -16.5388);
-        const windKnots   = wx.daily.wind_speed_10m_max[0];
-        const weatherCode = wx.daily.weather_code[0];
-        const precipMm    = wx.daily.precipitation_sum[0] ?? 0;
-        const waveM       = marine.daily?.wave_height_max?.[0] ?? 0;
+        const clusters = [...buildRankClusters().values()];
 
-        const cats = ['wind','air','water','wheels','feet','motor','food','culture'];
-        const scored = cats.map(cat => ({
-          cat,
-          score: scoreCategory(cat, windKnots, weatherCode, precipMm, waveM),
-          cfg: CATEGORIES[cat]
+        // One fetch per cluster. A failed cluster leaves its activities unscored
+        // this cycle; the ranker still renders from the rest. All-fail → fallback.
+        const forecasts = await Promise.all(clusters.map(async c => {
+          try {
+            const f  = await fetchClusterWx(c);
+            return { cluster: c, forecast: f, windSeries: clusterWindSeries(f, c.isElMedano),
+                     cached: f.cached, ok: true };
+          } catch (e) {
+            console.error('[ranker] cluster failed:', c.key, e);
+            return { cluster: c, ok: false };
+          }
         }));
+        const byKey = new Map(forecasts.map(f => [f.cluster.key, f]));
+        if (!forecasts.some(f => f.ok)) throw new Error('all clusters failed');
 
+        // Score each activity on its own cluster + local window; roll up to
+        // category = best (max) activity — you'd pick the good option; mean
+        // would wrongly punish a category for having a bad-today option.
         const order = { green: 0, amber: 1, red: 2 };
-        scored.sort((a, b) => order[a.score] - order[b.score]);
+        const activities = [];
+        const rollup = {};
+        for (const [slug, g] of Object.entries(ACTIVITY_GEO)) {
+          const f = byKey.get(clusterKeyFor(g.lat, g.lon, g.elevation_m));
+          if (!f || !f.ok) continue;
+          const cond = activityConditions(f.forecast, f.windSeries, f.cluster.isElMedano, g.window);
+          if (!cond) continue;
+          const a = { slug, title: g.title, zone: g.zone, category: g.category,
+                      clusterKey: f.cluster.key, window: g.window, cond,
+                      score: scoreCategory(g.category, cond.wind, cond.weatherCode, cond.precip, cond.wave) };
+          activities.push(a);
+          if (!rollup[g.category] || order[a.score] < order[rollup[g.category].score])
+            rollup[g.category] = { score: a.score, winner: a };
+        }
+        if (!activities.length) throw new Error('no activity scored');
 
+        // Diagnostics: one forecast per cluster in the network tab; per-activity
+        // window-scoped scores here (Spec B reads window.__follyRank below).
+        console.group('[ranker] per-activity scores');
+        forecasts.filter(f => !f.ok).forEach(f =>
+          console.warn(`✗ ${f.cluster.key} [${f.cluster.members.join(', ')}] — fetch failed, unscored`));
+        activities.forEach(a => console.log(
+          `${a.score.toUpperCase().padEnd(5)} ${a.slug} @${a.clusterKey}` +
+          ` win=${a.window[0]}–${a.window[1]}h wind=${a.cond.wind.toFixed(1)}kn` +
+          ` precip=${a.cond.precip.toFixed(1)}mm code=${a.cond.weatherCode} wave=${a.cond.wave}m` +
+          ` spread=${a.cond.spreadKn == null ? 'n/a' : a.cond.spreadKn.toFixed(1) + 'kn'}` +
+          (byKey.get(a.clusterKey).cluster.isElMedano ? ' ← El Médano (ECMWF central, bias applied)' : '')));
+        console.groupEnd();
+
+        const scored = Object.keys(rollup)
+          .map(cat => ({ cat, score: rollup[cat].score, winner: rollup[cat].winner, cfg: CATEGORIES[cat] }))
+          .sort((a, b) => order[a.score] - order[b.score]);
         const top = scored[0];
+
+        // Garage day: every weather-sensitive category is red → food/culture
+        // surface as the honest top. Exempt categories are never
+        // conditions-scored and never weather-penalized.
+        const garage = scored.every(s => s.score === 'red');
+
+        window.__follyRank = {
+          asOf: Date.now(), garage,
+          activities: activities.map(a => ({ slug: a.slug, title: a.title, zone: a.zone,
+            category: a.category, score: a.score, wind: +a.cond.wind.toFixed(1),
+            precip: +a.cond.precip.toFixed(2), code: a.cond.weatherCode,
+            spreadKn: a.cond.spreadKn == null ? null : +a.cond.spreadKn.toFixed(1) })),
+          categories: Object.fromEntries(scored.map(s => [s.cat, { score: s.score, winner: s.winner.slug }]))
+        };
+
         const jdmCopy = {
           wind:    "Conditions are optimal. The Chronicler has located his harness. It was under the golf clubs.",
           air:     "The air is behaving. The Keeper has already gone. The Chronicler is considering it.",
@@ -3119,35 +3402,60 @@
           culture: "An indoor day. The Chronicler will visit something historical and explain it incorrectly."
         };
 
-        document.getElementById('rankerOutput').innerHTML = `
+        const scoreWord = { green: 'good today', amber: 'workable today', red: 'not today' };
+        const heroCfg   = garage ? CATEGORIES.food : top.cfg;
+        const heroLabel = garage ? 'Food &amp; Culture' : top.cfg.label;
+        const heroQuote = garage ? jdmCopy.food : jdmCopy[top.cat];
+        const conf      = (!garage && top.winner.cond.spreadKn != null)
+          ? confidenceBand(top.winner.cond.spreadKn).label : '';
+        const heroSub   = garage
+          ? 'Every outdoor category scores red today — an honest indoor day.'
+          : `${scoreWord[top.score]} · best bet: ${escapeHtml(top.winner.zone)}${conf ? ' · ' + conf : ''}`;
+
+        out.innerHTML = `
           <div style="margin-bottom:20px;">
             <div style="font-family:var(--font-display); font-size:28px; font-weight:700;
-                        color:${top.cfg.color}; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px;">
-              ${top.cfg.label}
+                        color:${heroCfg.color}; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px;">
+              ${heroLabel}
+            </div>
+            <div style="font-size:13px; color:var(--smoke); letter-spacing:0.5px; margin-bottom:8px;">
+              ${heroSub}
             </div>
             <div style="font-family:var(--font-diary); font-style:italic; font-size:15px;
                         color:var(--smoke); line-height:1.7; max-width:600px;">
-              "${jdmCopy[top.cat]}"
+              "${heroQuote}"
             </div>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            ${garage ? ['food', 'culture'].map(cat => `
+              <div style="background:var(--charcoal); border-radius:6px; padding:8px 14px;
+                          border-left:3px solid ${CATEGORIES[cat].color}">
+                <div style="font-family:var(--font-display); font-size:11px; font-weight:700;
+                            letter-spacing:2px; text-transform:uppercase; color:${CATEGORIES[cat].color}">
+                  ${CATEGORIES[cat].label}
+                </div>
+                <div style="font-size:10px; color:var(--iron); margin-top:2px;">rain-proof</div>
+              </div>
+            `).join('') : ''}
             ${scored.map(s => `
               <div style="background:var(--charcoal); border-radius:6px; padding:8px 14px;
-                          border-left:3px solid ${s.score === 'green' ? s.cfg.color : s.score === 'amber' ? '#C4A03E' : '#333'}">
+                          border-left:3px solid ${s.score === 'green' ? s.cfg.color : s.score === 'amber' ? '#C4A03E' : '#333'}"
+                   title="${s.winner.cond.spreadKn != null ? escapeHtml(confidenceBand(s.winner.cond.spreadKn).label) : ''}">
                 <div style="font-family:var(--font-display); font-size:11px; font-weight:700;
                             letter-spacing:2px; text-transform:uppercase;
                             color:${s.score === 'green' ? s.cfg.color : s.score === 'amber' ? '#C4A03E' : 'var(--iron)'}">
                   ${s.cfg.label}
                 </div>
+                <div style="font-size:10px; color:var(--iron); margin-top:2px;">${escapeHtml(s.winner.zone)}</div>
               </div>
             `).join('')}
           </div>
           <div style="font-size:11px; color:var(--iron); margin-top:12px; font-style:italic;">
-            Based on forecast for Tenerife South · Updates every 2 hours
+            Per-zone forecast across the island · Updates every 2 hours
           </div>
         `;
       } catch(e) {
-        document.getElementById('rankerOutput').innerHTML =
+        out.innerHTML =
           '<p style="color:var(--iron);">Forecast unavailable. Check conditions directly.</p>';
         console.error('Ranker failed:', e);
       }
