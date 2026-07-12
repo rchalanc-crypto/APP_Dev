@@ -1745,9 +1745,7 @@
         limitToLast(10)
       );
       onValue(diaryRef, (snapshot) => {
-        const entries = [];
-        snapshot.forEach(child => entries.unshift({ id: child.key, ...child.val() }));
-        renderDiary(entries);
+        renderDiary(collectChildren(snapshot).reverse()); // newest first
       });
     }
 
@@ -1862,10 +1860,7 @@
         limitToLast(20)
       );
       onValue(briefsRef, (snapshot) => {
-        const briefs = [];
-        snapshot.forEach(child => briefs.push({ id: child.key, ...child.val() }));
-        briefs.reverse();
-        renderBriefs(briefs);
+        renderBriefs(collectChildren(snapshot).reverse()); // newest first
       });
     }
 
@@ -2331,8 +2326,7 @@
     function loadAdminDiaryList() {
       const diaryRef = query(ref(db, 'content/diary'), orderByChild('created_at'));
       onValue(diaryRef, (snapshot) => {
-        const entries = [];
-        snapshot.forEach(c => entries.unshift({ id: c.key, ...c.val() }));
+        const entries = collectChildren(snapshot).reverse(); // newest first
         const list = document.getElementById('adminDiaryList');
         if (!list) return;
         if (entries.length === 0) {
@@ -2434,8 +2428,7 @@
         orderByChild('created_at')
       );
       onValue(briefsRef, (snapshot) => {
-        const briefs = [];
-        snapshot.forEach(c => briefs.unshift({ id: c.key, ...c.val() }));
+        const briefs = collectChildren(snapshot).reverse(); // newest first
         const list = document.getElementById('adminBriefsList');
         if (!list) return;
         if (briefs.length === 0) {
@@ -3138,16 +3131,23 @@
       return String(s).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
-    // Collect a DataSnapshot's children into a sorted array.
+    // THE shared snapshot collector — every content list (diary, briefs,
+    // admin lists, activities) goes through here; never call
+    // snapshot.forEach directly. Returns children in snapshot iteration
+    // order (ascending by the query's orderByChild).
     // FIREBASE API FOOTGUN: DataSnapshot.forEach CANCELS iteration when the
     // callback returns ANY truthy value (SDK checks truthiness, not === true).
     // push()/unshift() return the new length — truthy from the first child —
     // so the callback body MUST be braced, never an implicit return. This
-    // exact bug truncated allActivities to one record (2026-07-11).
-    function collectActivities(snapshot) {
+    // exact bug truncated every content list to its first record (found
+    // 2026-07-11 via the ranker orphan audit).
+    function collectChildren(snapshot) {
       const list = [];
       snapshot.forEach(child => { list.push({ id: child.key, ...child.val() }); });
-      return list.sort((a, b) => (a.order || 0) - (b.order || 0));
+      return list;
+    }
+    function collectActivities(snapshot) {
+      return collectChildren(snapshot).sort((a, b) => (a.order || 0) - (b.order || 0));
     }
     // Dev-warning: an ACTIVITY_GEO key with no matching live record title was
     // orphaned by a title edit — loud in console, safe (exempt) at runtime.
