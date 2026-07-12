@@ -10,6 +10,53 @@
 > Entries ordered newest-first (reverse chronological); mark each [COMPLETED] or [PENDING].
 
 ---
+## [2026-07-11] — Ranker geo/temporal rework + snapshot-collector fix + El Médano embed [COMPLETED]
+
+Per `SPEC-folly-ranker-geo-rework.md` (Steps 1–3), one session, five path-scoped commits,
+each verified by a scratch node audit harness (68 checks final: static / logic / synthetic
+failures / live Open-Meteo / HEAD-repro) with Robert's live passes gating between rulings.
+
+- **Widget wx guards** (`511d3aa`, pre-existing bug, separately ruled): corrupt `wx_*`
+  localStorage entries threw in `JSON.parse` *before* the TTL check and were never
+  overwritten — permanently bricking the El Médano kite card; daily-less payloads passed the
+  `current`-only validation and TypeError'd from cache for a full TTL. Cache reads now
+  try/catch + purge; shape-checked; `daily` validated before caching.
+- **Ranker rework** (`45a0529`): 13 weather-sensitive activities scored at their own
+  location/elevation/local window via 11 clustered fetches (0.1° grid cell + sea/mid/high
+  elevation band, 2h cache, `Atlantic/Canary`, `kn`). Central estimate = ensemble median;
+  El Médano cluster = ECMWF IFS member (`ecmwf_ifs`, live-verified) with neutral
+  `ELMEDANO_WIND_BIAS` hook (mult 1.0 / add 0 — calibrate against live readings, never guess).
+  Spread stays ensemble-wide everywhere. Roll-up = best activity per category (not mean);
+  hero names the winning zone; garage day surfaces food/culture (exempt cats never
+  weather-scored). Ruled `RANK_LIMITS` thresholds gave wheels/feet/motor real red states
+  (motor was hardcoded green — garage day had been unreachable). Weather code follows the
+  central model (ruled: one pessimistic ensemble member must not flag a dry cluster).
+  Per-activity scores exposed at `window.__follyRank` for Spec B.
+- **Live-pass fixes** (`5844578`): orphan audit prints verbatim live titles→slugs in its single
+  warning; `rankSlugify` folds all combining marks (`\p{M}`) and is the app's only
+  normalization path; chip sublines carry ±ensemble-spread (touch-readable); El Médano console
+  line reads "bias neutral" unless the constant is non-neutral.
+- **Snapshot early-cancel fix** (`46fc09c`, ruled after ground-truth reconciliation):
+  `DataSnapshot.forEach` cancels on ANY truthy callback return (SDK 10.7.1
+  `!!e(k,v)`); `push()/unshift()` implicit returns had truncated **every content list to its
+  first record** — diary showed 1 of 3 entries (the oldest) since Phase 3; briefs/admin lists
+  were latent time bombs masked by single-record nodes. All four collectors now route through
+  one shared `collectChildren(snapshot)` (braced callback, footgun comment); activities
+  collector is a thin sort wrapper on the same seam. Found via the ranker orphan audit's 12/13
+  false-positive — which was this bug, not title drift.
+- **El Médano live wind embed** (`e436ceb`, Step 3, the single permitted widget edit):
+  collapsible block under the kite cards; Windfinder spot-widget iframe (official widget
+  endpoint, no `X-Frame-Options`/`frame-ancestors`) injected only on first expand — zero
+  first-paint cost, zero third-party requests until tapped; domain pinned (`EMBED_ORIGIN`,
+  the app's only iframe); permanent `noopener` new-tab link-out beneath. Skeptic supply-chain
+  touch: no criticals; pre-existing Important ticketed (tabler icons `@latest` unpinned,
+  `index.html:8`).
+- **Debug switch**: per-activity score table gated behind `localStorage.folly_rank_debug='1'`
+  (or `?rankdebug=1`, persists) for trip-time bias calibration; ungated one-line `[ranker]
+  scored N/13…` breadcrumb always prints and names the switch; orphan/cluster-failure
+  warnings never gated.
+
+---
 ## [2026-07-09] — Readability: diary prose 18px + evergreen Crew section [COMPLETED]
 
 Per `SPEC-folly-readability-crew.md`. The prose-col (~680px centered) and 16.5px base font were
