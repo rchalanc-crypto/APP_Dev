@@ -3120,18 +3120,31 @@
       'karting-club-tenerife':                  { title: 'Karting Club Tenerife',                      category: 'motor',  lat: 28.083,  lon: -16.732,  elevation_m: 150,  window: [10, 18], zone: 'Costa Adeje (south)' }
     };
 
-    // Stable slug for matching live records ↔ ACTIVITY_GEO (diacritic-folded).
+    // THE slug function — the single normalization path shared by the scorer
+    // key space, the orphan audit, and (future) Spec B's score→grid join.
+    // Never add a second normalizer. \p{M} folds every combining mark
+    // (superset of \p{Diacritic}), so NFC/NFD-stored titles slug identically.
     function rankSlugify(s) {
-      return String(s).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+      return String(s).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
     // Dev-warning: an ACTIVITY_GEO key with no matching live record title was
     // orphaned by a title edit — loud in console, safe (exempt) at runtime.
+    // ONE warning per audit; on any orphan it includes the live weather-category
+    // titles verbatim (JSON-escaped) with their slugs — ground truth for
+    // re-keying, same diagnostic pattern as seed-tutorials.html.
     function rankGeoAudit(records) {
-      const live = new Set(records.map(a => rankSlugify(a.title)));
+      const rows = records.map(a => ({ title: a.title, slug: rankSlugify(a.title), category: a.category }));
+      const live = new Set(rows.map(r => r.slug));
       const orphans = Object.keys(ACTIVITY_GEO).filter(k => !live.has(k));
-      if (orphans.length)
-        console.warn('[ranker] ACTIVITY_GEO entries orphaned by title edits (their activities go unscored/exempt):', orphans.join(', '));
+      if (!orphans.length) return;
+      const wxCats = new Set(Object.values(ACTIVITY_GEO).map(g => g.category));
+      console.warn(
+        '[ranker] ACTIVITY_GEO entries orphaned by title edits (Spec B joins will miss them): ' +
+        orphans.join(', ') +
+        '\nLive titles → slugs (ground truth for re-keying): ' +
+        rows.filter(r => wxCats.has(r.category))
+            .map(r => `${JSON.stringify(r.title)} → ${r.slug}`).join(' | '));
     }
     function roundGrid(v)   { return Math.round(v / GRID_ROUND) * GRID_ROUND; }
     function elevBand(m)    { return m < ELEV_BANDS[0] ? 'sea' : m < ELEV_BANDS[1] ? 'mid' : 'high'; }
@@ -3369,7 +3382,9 @@
           ` win=${a.window[0]}–${a.window[1]}h wind=${a.cond.wind.toFixed(1)}kn` +
           ` precip=${a.cond.precip.toFixed(1)}mm code=${a.cond.weatherCode} wave=${a.cond.wave}m` +
           ` spread=${a.cond.spreadKn == null ? 'n/a' : a.cond.spreadKn.toFixed(1) + 'kn'}` +
-          (byKey.get(a.clusterKey).cluster.isElMedano ? ' ← El Médano (ECMWF central, bias applied)' : '')));
+          (byKey.get(a.clusterKey).cluster.isElMedano
+            ? ` ← El Médano (ECMWF central, bias ${ELMEDANO_WIND_BIAS.mult === 1.0 && ELMEDANO_WIND_BIAS.add === 0 ? 'neutral' : 'APPLIED ×' + ELMEDANO_WIND_BIAS.mult + ' +' + ELMEDANO_WIND_BIAS.add})`
+            : '')));
         console.groupEnd();
 
         const scored = Object.keys(rollup)
@@ -3446,7 +3461,7 @@
                             color:${s.score === 'green' ? s.cfg.color : s.score === 'amber' ? '#C4A03E' : 'var(--iron)'}">
                   ${s.cfg.label}
                 </div>
-                <div style="font-size:10px; color:var(--iron); margin-top:2px;">${escapeHtml(s.winner.zone)}</div>
+                <div style="font-size:10px; color:var(--iron); margin-top:2px;">${escapeHtml(s.winner.zone)}${s.winner.cond.spreadKn != null ? ` · ±${s.winner.cond.spreadKn < 10 ? s.winner.cond.spreadKn.toFixed(1) : Math.round(s.winner.cond.spreadKn)} kn` : ''}</div>
               </div>
             `).join('')}
           </div>
