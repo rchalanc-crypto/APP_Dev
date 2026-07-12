@@ -2639,9 +2639,7 @@
     function initActivities() {
       const activitiesRef = ref(db, 'content/activities');
       onValue(activitiesRef, (snapshot) => {
-        allActivities = [];
-        snapshot.forEach(child => allActivities.push({ id: child.key, ...child.val() }));
-        allActivities.sort((a, b) => (a.order || 0) - (b.order || 0));
+        allActivities = collectActivities(snapshot);
         rankGeoAudit(allActivities);
         renderActivityFilters();
         renderActivities();
@@ -3099,6 +3097,18 @@
       feet:   { redPrecip: 8, redWind: 35, amberPrecip: 2, amberCode: 51 }, // hiking
       motor:  { redPrecip: 4, amberPrecip: 1, amberCode: 51 }               // karting (outdoor)
     };
+    // Score-table console logging: OFF by default. Enable with
+    // localStorage.folly_rank_debug = '1' (or load once with ?rankdebug=1,
+    // which persists the flag; remove the key to quiet). Used for El Médano
+    // bias calibration. Orphan-audit warnings and cluster-failure
+    // warnings/errors are NEVER gated by this — only the score table is.
+    const RANK_DEBUG = (() => {
+      try {
+        if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('rankdebug'))
+          localStorage.setItem('folly_rank_debug', '1');
+        return localStorage.getItem('folly_rank_debug') === '1';
+      } catch (e) { return false; }
+    })();
 
     // Authored per-activity geo. Keyed by title-slug (rankSlugify of the live
     // record title) — legible, survives a reseed, and a title edit orphans the
@@ -3127,6 +3137,17 @@
     function rankSlugify(s) {
       return String(s).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    // Collect a DataSnapshot's children into a sorted array.
+    // FIREBASE API FOOTGUN: DataSnapshot.forEach CANCELS iteration when the
+    // callback returns ANY truthy value (SDK checks truthiness, not === true).
+    // push()/unshift() return the new length — truthy from the first child —
+    // so the callback body MUST be braced, never an implicit return. This
+    // exact bug truncated allActivities to one record (2026-07-11).
+    function collectActivities(snapshot) {
+      const list = [];
+      snapshot.forEach(child => { list.push({ id: child.key, ...child.val() }); });
+      return list.sort((a, b) => (a.order || 0) - (b.order || 0));
     }
     // Dev-warning: an ACTIVITY_GEO key with no matching live record title was
     // orphaned by a title edit — loud in console, safe (exempt) at runtime.
@@ -3372,20 +3393,27 @@
         }
         if (!activities.length) throw new Error('no activity scored');
 
-        // Diagnostics: one forecast per cluster in the network tab; per-activity
-        // window-scoped scores here (Spec B reads window.__follyRank below).
-        console.group('[ranker] per-activity scores');
+        // Diagnostics. Cluster failures always warn (never gated); the
+        // per-activity score table renders only under RANK_DEBUG; a one-line
+        // summary always prints and names the switch (bias-calibration aid).
         forecasts.filter(f => !f.ok).forEach(f =>
-          console.warn(`✗ ${f.cluster.key} [${f.cluster.members.join(', ')}] — fetch failed, unscored`));
-        activities.forEach(a => console.log(
-          `${a.score.toUpperCase().padEnd(5)} ${a.slug} @${a.clusterKey}` +
-          ` win=${a.window[0]}–${a.window[1]}h wind=${a.cond.wind.toFixed(1)}kn` +
-          ` precip=${a.cond.precip.toFixed(1)}mm code=${a.cond.weatherCode} wave=${a.cond.wave}m` +
-          ` spread=${a.cond.spreadKn == null ? 'n/a' : a.cond.spreadKn.toFixed(1) + 'kn'}` +
-          (byKey.get(a.clusterKey).cluster.isElMedano
-            ? ` ← El Médano (ECMWF central, bias ${ELMEDANO_WIND_BIAS.mult === 1.0 && ELMEDANO_WIND_BIAS.add === 0 ? 'neutral' : 'APPLIED ×' + ELMEDANO_WIND_BIAS.mult + ' +' + ELMEDANO_WIND_BIAS.add})`
-            : '')));
-        console.groupEnd();
+          console.warn(`✗ [ranker] cluster ${f.cluster.key} [${f.cluster.members.join(', ')}] fetch failed — unscored this cycle`));
+        if (RANK_DEBUG) {
+          console.group('[ranker] per-activity scores');
+          activities.forEach(a => console.log(
+            `${a.score.toUpperCase().padEnd(5)} ${a.slug} @${a.clusterKey}` +
+            ` win=${a.window[0]}–${a.window[1]}h wind=${a.cond.wind.toFixed(1)}kn` +
+            ` precip=${a.cond.precip.toFixed(1)}mm code=${a.cond.weatherCode} wave=${a.cond.wave}m` +
+            ` spread=${a.cond.spreadKn == null ? 'n/a' : a.cond.spreadKn.toFixed(1) + 'kn'}` +
+            (byKey.get(a.clusterKey).cluster.isElMedano
+              ? ` ← El Médano (ECMWF central, bias ${ELMEDANO_WIND_BIAS.mult === 1.0 && ELMEDANO_WIND_BIAS.add === 0 ? 'neutral' : 'APPLIED ×' + ELMEDANO_WIND_BIAS.mult + ' +' + ELMEDANO_WIND_BIAS.add})`
+              : '')));
+          console.groupEnd();
+        }
+        console.info(
+          `[ranker] scored ${activities.length}/${Object.keys(ACTIVITY_GEO).length} activities` +
+          ` across ${forecasts.filter(f => f.ok).length}/${clusters.length} clusters` +
+          (RANK_DEBUG ? '' : ` — score table: localStorage.folly_rank_debug='1' (or ?rankdebug=1), then reload`));
 
         const scored = Object.keys(rollup)
           .map(cat => ({ cat, score: rollup[cat].score, winner: rollup[cat].winner, cfg: CATEGORIES[cat] }))
