@@ -873,6 +873,18 @@
 
     @media (min-width: 600px) { .wx-grid { grid-template-columns: repeat(3, 1fr); } }
 
+    .wx-embed { margin-top: 14px; }
+    .wx-embed-toggle {
+      background: var(--charcoal); color: var(--smoke); border: 1px solid #333;
+      border-radius: 8px; padding: 10px 16px; width: 100%; text-align: left;
+      font-family: var(--font-display); font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .wx-embed-toggle:hover { border-color: var(--neon); color: var(--neon); }
+    .wx-embed-caret { color: var(--neon); margin-right: 6px; }
+    #kiteEmbedSlot { margin-top: 10px; }
+
     .wx-card {
       background: var(--charcoal);
       border-radius: 10px;
@@ -2847,13 +2859,49 @@
         launches: 'El Médano · El Cabezo · La Tejita' }
     ];
 
+    // ── §C.1 — El Médano live wind embed (Step 3) ─────────────────
+    // The ONLY third-party frame in the app; domain pinned to Windfinder
+    // (their official widget endpoint — verified 200 with no
+    // X-Frame-Options / frame-ancestors). The iframe is injected on first
+    // expand only (lazy — zero first-paint cost); link-outs open new tabs
+    // with rel=noopener. We fetch/hotlink none of their data — their
+    // widget, their bandwidth, rendered in their frame.
+    const EMBED_ORIGIN       = 'https://www.windfinder.com'; // pinned — never another origin
+    const EMBED_WIDGET_URL   = EMBED_ORIGIN + '/widget/forecast/el_medano?unit=kn&days=3&show_day=1';
+    const EMBED_FORECAST_URL = EMBED_ORIGIN + '/forecast/el_medano';
+
+    window.toggleKiteEmbed = function(btn) {
+      const slot = document.getElementById('kiteEmbedSlot');
+      if (!slot) return;
+      const open = slot.hidden;
+      slot.hidden = !open;
+      btn.innerHTML = `<span class="wx-embed-caret">${open ? '▾' : '▸'}</span> El Médano — live wind`;
+      if (open && !slot.dataset.loaded) {
+        slot.dataset.loaded = '1'; // inject once, on first expand only
+        slot.innerHTML = `
+          <iframe src="${EMBED_WIDGET_URL}" loading="lazy"
+                  style="width:100%;height:310px;border:0;border-radius:8px;background:var(--charcoal);"
+                  title="El Médano live wind — Windfinder"></iframe>
+          <div style="margin-top:8px;">
+            <a href="${EMBED_FORECAST_URL}" target="_blank" rel="noopener"
+               style="color:var(--neon);font-size:12px;">Full El Médano forecast on Windfinder ↗</a>
+          </div>`;
+      }
+    };
+
     async function initKiteWidget() {
       const panel = document.getElementById('condKite');
       panel.innerHTML = '<div class="wx-grid">' +
         KITE_SPOTS.map((s, i) => `<div class="wx-card" id="kite_card_${i}">
           <div class="wx-spot-name">${s.name}</div>
           <div style="color:var(--iron);font-size:12px;">Loading…</div>
-        </div>`).join('') + '</div>';
+        </div>`).join('') + '</div>' +
+        `<div class="wx-embed">
+          <button class="wx-embed-toggle" onclick="toggleKiteEmbed(this)">
+            <span class="wx-embed-caret">▸</span> El Médano — live wind
+          </button>
+          <div id="kiteEmbedSlot" hidden></div>
+        </div>`;
 
       for (let i = 0; i < KITE_SPOTS.length; i++) {
         const spot = KITE_SPOTS[i];
