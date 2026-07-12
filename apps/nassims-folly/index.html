@@ -2720,8 +2720,11 @@
 
     async function fetchWeather(lat, lon) {
       const cacheKey = `wx_${lat}_${lon}`;
-      const cached   = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if (cached && Date.now() - cached.ts < WX_CACHE_TTL)
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(cacheKey) || 'null'); }
+      catch (e) { localStorage.removeItem(cacheKey); } // corrupt entry = miss; purge so it can't re-brick
+      if (cached && cached.data?.wx?.current && cached.data.wx.daily && cached.data.marine
+          && Date.now() - cached.ts < WX_CACHE_TTL)
         return { ...cached.data, asOf: new Date(cached.ts) };
 
       const [wxRes, marineRes] = await Promise.all([
@@ -2736,6 +2739,8 @@
       if (!wxRes.ok) throw new Error(`Weather API ${wxRes.status} for ${lat},${lon}`);
       const wx = await wxRes.json();
       if (!wx.current) throw new Error(`Weather API bad payload: ${JSON.stringify(wx).slice(0,200)}`);
+      if (!wx.daily || !wx.daily.time)
+        throw new Error(`Weather API bad payload (no daily): ${JSON.stringify(wx).slice(0,200)}`);
       const marine = marineRes.ok ? await marineRes.json() : { current: {}, daily: {} };
       const data   = { wx, marine };
 
@@ -2745,8 +2750,10 @@
 
     async function fetchEnsembleWind(lat, lon, C = WX_ENS) {
       const cacheKey = `wxens_${lat}_${lon}_${C.MODELS.join('-')}`;
-      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-      if (cached && Date.now() - cached.ts < C.CACHE_TTL_MS)
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(cacheKey) || 'null'); }
+      catch (e) { localStorage.removeItem(cacheKey); } // corrupt entry = miss; purge so it can't re-brick
+      if (cached && cached.data?.hourly?.time && Date.now() - cached.ts < C.CACHE_TTL_MS)
         return { ...cached.data, asOf: new Date(cached.ts) };
 
       const res = await fetch(
