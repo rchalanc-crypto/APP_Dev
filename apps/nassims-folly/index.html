@@ -884,6 +884,11 @@
     .wx-embed-toggle:hover { border-color: var(--neon); color: var(--neon); }
     .wx-embed-caret { color: var(--neon); margin-right: 6px; }
     #kiteEmbedSlot { margin-top: 10px; }
+    .wx-embed-card {
+      background: #fff; padding: 8px; border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      max-width: 560px; margin: 0 auto;
+    }
 
     .wx-card {
       background: var(--charcoal);
@@ -2867,7 +2872,13 @@
     // with rel=noopener. We fetch/hotlink none of their data — their
     // widget, their bandwidth, rendered in their frame.
     const EMBED_ORIGIN       = 'https://www.windfinder.com'; // pinned — never another origin
-    const EMBED_WIDGET_URL   = EMBED_ORIGIN + '/widget/forecast/el_medano?unit=kn&days=3&show_day=1';
+    // show_pressure=0 drops the pressure row (verified against the endpoint);
+    // remaining rows by Windfinder's own CSS: 70 header + 72 wind block +
+    // ~10×22 rows + day names + powered-by ≈ 430px natural height. The widget
+    // is width-responsive (.widget{width:100%}) and light-only (no theme
+    // param), hence the fixed 450px frame inside a deliberate light card —
+    // white slack reads as card padding, never as clip or dead space.
+    const EMBED_WIDGET_URL   = EMBED_ORIGIN + '/widget/forecast/el_medano?unit=kn&days=3&show_day=1&show_pressure=0';
     const EMBED_FORECAST_URL = EMBED_ORIGIN + '/forecast/el_medano';
 
     window.toggleKiteEmbed = function(btn) {
@@ -2879,10 +2890,12 @@
       if (open && !slot.dataset.loaded) {
         slot.dataset.loaded = '1'; // inject once, on first expand only
         slot.innerHTML = `
-          <iframe src="${EMBED_WIDGET_URL}" loading="lazy"
-                  style="width:100%;height:310px;border:0;border-radius:8px;background:var(--charcoal);"
-                  title="El Médano live wind — Windfinder"></iframe>
-          <div style="margin-top:8px;">
+          <div class="wx-embed-card">
+            <iframe src="${EMBED_WIDGET_URL}" loading="lazy"
+                    style="width:100%;height:450px;border:0;border-radius:6px;background:#fff;display:block;"
+                    title="El Médano live wind — Windfinder"></iframe>
+          </div>
+          <div style="max-width:560px;margin:8px auto 0;text-align:center;">
             <a href="${EMBED_FORECAST_URL}" target="_blank" rel="noopener"
                style="color:var(--neon);font-size:12px;">Full El Médano forecast on Windfinder ↗</a>
           </div>`;
